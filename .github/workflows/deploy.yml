@@ -24,9 +24,10 @@ jobs:
             echo "Error: REMOTE_HOST secret is not set."
             exit 1
           fi
+          echo "Using REMOTE_HOST: ${{ secrets.REMOTE_HOST }}"
           # Add remote host to known_hosts with error handling
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> $HOME/.ssh/known_hosts || {
-            echo "Error: Failed to add SSH host key."
+            echo "Error: Failed to add SSH host key for ${{ secrets.REMOTE_HOST }}."
             exit 1
           }
 
