@@ -1,9 +1,10 @@
-name: Deploy Website
+name: Deploy Static HTML Site
 
 on:
   push:
     branches:
-      - main  # Trigger deployment on push to main branch
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -20,13 +21,14 @@ jobs:
           chmod 600 $HOME/.ssh/id_rsa_github_actions
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> $HOME/.ssh/known_hosts
 
-      - name: Copy files to remote server
+      - name: Copy static files to remote server
         run: |
-          rsync -az --delete -e "ssh -i ~/.ssh/id_rsa_github_actions" ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
+          rsync -az --delete -e "ssh -i $HOME/.ssh/id_rsa_github_actions" ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
 
-      - name: Run deploy.sh on remote server
+      - name: Confirm deployment on remote server
         run: |
           ssh -i $HOME/.ssh/id_rsa_github_actions ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
-            cd ${{ secrets.REMOTE_PATH }}
-            bash deploy.sh
+            echo "Files deployed to ${{ secrets.REMOTE_PATH }}"
+            ls -la ${{ secrets.REMOTE_PATH }}
           EOF
+
