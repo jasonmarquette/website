@@ -31,6 +31,11 @@ jobs:
             exit 1
           }
 
+      - name: Test SSH manually
+        run: |
+          ssh -i ~/.ssh/id_rsa_github_actions -o StrictHostKeyChecking=yes ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "echo Connected successfully"
+      
+      
       - name: Copy static files to remote server
         run: |
           rsync -az --delete -e "ssh -i $HOME/.ssh/id_rsa_github_actions -o StrictHostKeyChecking=yes" ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
