@@ -14,6 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: debug ssh
+        run: |
+          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}"
+          echo "REMOTE_HOST=${{ secrets.REMOTE_HOST }}"
+          echo "REMOTE_USER=${{ secrets.REMOTE_USER }}"
+          echo "REMOTE_PATH=${{ secrets.REMOTE_PATH }}"
+          cat $HOME/.ssh/id_rsa_github_actions
+          ssh -v -i $HOME/.ssh/id_rsa_github_actions ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} exit
+
       - name: Set up SSH
         run: |
           mkdir -p $HOME/.ssh
