@@ -16,9 +16,9 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p $HOME/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github_actions
-          chmod 600 ~/.ssh/id_rsa_github_actions
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/id_rsa_github_actions
+          chmod 600 $HOME/.ssh/id_rsa_github_actions
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> $HOME/.ssh/known_hosts
 
       - name: Copy files to remote server
         run: |
@@ -26,7 +26,7 @@ jobs:
 
       - name: Run deploy.sh on remote server
         run: |
-          ssh -i ~/.ssh/id_rsa_github_actions ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -i $HOME/.ssh/id_rsa_github_actions ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
             cd ${{ secrets.REMOTE_PATH }}
             bash deploy.sh
           EOF
