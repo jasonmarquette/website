@@ -1,0 +1,32 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github_actions
+          chmod 600 ~/.ssh/id_rsa_github_actions
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy files to remote server
+        run: |
+          rsync -az --delete -e "ssh -i ~/.ssh/id_rsa_github_actions" ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
+
+      - name: Run deploy.sh on remote server
+        run: |
+          ssh -i ~/.ssh/id_rsa_github_actions ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+            cd ${{ secrets.REMOTE_PATH }}
+            bash deploy.sh
+          EOF
