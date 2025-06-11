@@ -18,29 +18,31 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p "$HOME/.ssh"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa_github_actions"
-          chmod 600 "$HOME/.ssh/id_rsa_github_actions"
-          if [ -z "${{ secrets.REMOTE_HOST }}" ]; then
-            echo "Error: REMOTE_HOST secret is not set."
-            exit 1
-          fi
-          echo "Using REMOTE_HOST: ${{ secrets.REMOTE_HOST }}"
-          ssh-keyscan -H "${{ secrets.REMOTE_HOST }}" >> "$HOME/.ssh/known_hosts" || {
-            echo "Error: Failed to add SSH host key for ${{ secrets.REMOTE_HOST }}."
-            exit 1
-          }
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
+          chmod 600 "$HOME/.ssh/id_rsa"
 
-      - name: Test SSH manually
+      - name: Add known hosts
         run: |
-          ssh -i "$HOME/.ssh/id_rsa_github_actions" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" "echo Connected successfully"
+          ssh-keyscan -H "${{ secrets.REMOTE_HOST_1 }}" >> "$HOME/.ssh/known_hosts"
+          ssh-keyscan -H "${{ secrets.REMOTE_HOST_2 }}" >> "$HOME/.ssh/known_hosts"
 
-      - name: Copy static files to remote server
+      - name: Deploy to Server 1
         run: |
-          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa_github_actions\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}"
-
-      - name: Confirm deployment on remote server
-        run: |
-          ssh -i "$HOME/.ssh/id_rsa_github_actions" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" << 'EOF'
-            echo "Files deployed to ${{ secrets.REMOTE_PATH }}"
+          echo "Deploying to Server 1..."
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_1 }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
+          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_1 }}:${{ secrets.REMOTE_PATH }}"
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_1 }}" << 'EOF'
+            echo "Deployment complete on Server 1:"
             ls -la "${{ secrets.REMOTE_PATH }}"
           EOF
+
+      - name: Deploy to Server 2
+        run: |
+          echo "Deploying to Server 2..."
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_2 }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
+          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_2 }}:${{ secrets.REMOTE_PATH }}"
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_2 }}" << 'EOF'
+            echo "Deployment complete on Server 2:"
+            ls -la "${{ secrets.REMOTE_PATH }}"
+          EOF
+
