@@ -1,3 +1,4 @@
+---
 name: Deploy Static HTML Site and app.py
 
 on:
@@ -26,24 +27,27 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          echo "Deploying static site to ${{ secrets.REMOTE_PATH }}..."
-          ssh -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
+          echo "Deploying static site..."
+          ssh -o StrictHostKeyChecking=yes \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
+            "mkdir -p '${{ secrets.REMOTE_PATH }}'"
 
-          rsync -az --delete -e "ssh -o StrictHostKeyChecking=yes" ./ \
+          rsync -az --delete -e \
+            "ssh -o StrictHostKeyChecking=yes" ./ \
             "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}"
 
-          echo "Deploying app.py to /home/ec2-user..."
-          rsync -az -e "ssh -o StrictHostKeyChecking=yes" ./app.py \
+          echo "Deploying app.py..."
+          rsync -az -e \
+            "ssh -o StrictHostKeyChecking=yes" ./app.py \
             "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/home/ec2-user/app.py"
 
-          ssh -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" << 'EOF'
-            chmod 755 /home/ec2-user/app.py
-            sync
-            echo "Deployment complete on server:"
-            echo "Static site contents:"
-            ls -la "${{ secrets.REMOTE_PATH }}"
-            echo "app.py details:"
-            ls -la /home/ec2-user/app.py
+          ssh -o StrictHostKeyChecking=yes \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" << 'EOF'
+              chmod 755 /home/ec2-user/app.py
+              sync
+              echo "Deployment complete:"
+              ls -la "${{ secrets.REMOTE_PATH }}"
+              ls -la /home/ec2-user/app.py
           EOF
 
       - name: Stop ssh-agent
