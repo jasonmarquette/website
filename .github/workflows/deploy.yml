@@ -23,7 +23,9 @@ jobs:
 
       - name: Add known hosts
         run: |
+          mkdir -p "$HOME/.ssh"
           echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
+          chmod 644 "$HOME/.ssh/known_hosts"
 
       - name: Deploy to Server
         run: |
@@ -46,7 +48,9 @@ jobs:
               chmod 755 /home/ec2-user/app.py
               sync
               echo "Deployment complete:"
+              echo "Static site contents:"
               ls -la "${{ secrets.REMOTE_PATH }}"
+              echo "app.py details:"
               ls -la /home/ec2-user/app.py
           EOF
 
