@@ -24,24 +24,24 @@ jobs:
           chmod 644 "$HOME/.ssh/known_hosts"
 
       # ✅ Show fingerprint of loaded key
-      - name: Debug: Show fingerprint of private key
+      - name:  Show fingerprint of private key
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tee key > /dev/null
           chmod 600 key
           ssh-keygen -lf key
 
       # ✅ Show what keys are actually loaded
-      - name: Debug: List keys loaded in ssh-agent
+      - name:  List keys loaded in ssh-agent
         run: ssh-add -l
 
       # ✅ Confirm user and host values are correct
-      - name: Debug: Print deployment user/host
+      - name:  Print deployment user/host
         run: |
           echo "REMOTE_USER=${{ secrets.REMOTE_USER }}"
           echo "REMOTE_HOST=${{ secrets.REMOTE_HOST }}"
 
       # ✅ Verbose SSH connection test
-      - name: Debug: Attempt SSH connection (verbose)
+      - name:  Attempt SSH connection (verbose)
         run: |
           ssh -v -o StrictHostKeyChecking=yes \
             "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
