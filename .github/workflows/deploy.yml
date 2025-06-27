@@ -12,42 +12,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up SSH agent
-        run: |
-          eval "$(ssh-agent -s)"
-          ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}")
-
       - name: Add known hosts
         run: |
           mkdir -p "$HOME/.ssh"
           echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
 
-      # ✅ Show fingerprint of loaded key
-      - name:  Show fingerprint of private key
+      - name: Start ssh-agent and verify connection
         run: |
+          eval "$(ssh-agent -s)"
+          ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}")
+
+          echo "✅ Fingerprint of private key:"
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tee key > /dev/null
           chmod 600 key
           ssh-keygen -lf key
 
-      # ✅ Show what keys are actually loaded
-      - name:  List keys loaded in ssh-agent
-        run: ssh-add -l
+          echo "✅ Keys currently loaded in agent:"
+          ssh-add -l
 
-      # ✅ Confirm user and host values are correct
-      - name:  Print deployment user/host
-        run: |
-          echo "REMOTE_USER=${{ secrets.REMOTE_USER }}"
-          echo "REMOTE_HOST=${{ secrets.REMOTE_HOST }}"
+          echo "✅ REMOTE_USER=${{ secrets.REMOTE_USER }}"
+          echo "✅ REMOTE_HOST=${{ secrets.REMOTE_HOST }}"
 
-      # ✅ Verbose SSH connection test
-      - name:  Attempt SSH connection (verbose)
-        run: |
+          echo "✅ Testing SSH connection:"
           ssh -v -o StrictHostKeyChecking=yes \
             "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
             "echo SSH connection successful"
 
-      # 🔁 Proceed with deployment (after debugging succeeds)
       - name: Deploy to Server
         run: |
           echo "Deploying static site..."
