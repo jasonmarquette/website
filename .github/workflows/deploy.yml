@@ -23,26 +23,18 @@ jobs:
 
       - name: Add known hosts
         run: |
-          ssh-keyscan -H "${{ secrets.REMOTE_HOST_1 }}" >> "$HOME/.ssh/known_hosts"
-          ssh-keyscan -H "${{ secrets.REMOTE_HOST_2 }}" >> "$HOME/.ssh/known_hosts"
+          ssh-keyscan -H "${{ secrets.REMOTE_HOST }}" >> "$HOME/.ssh/known_hosts"
+      
 
       - name: Deploy to Server 1
         run: |
           echo "Deploying to Server 1..."
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_1 }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
-          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_1 }}:${{ secrets.REMOTE_PATH }}"
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_1 }}" << 'EOF'
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
+          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}"
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" << 'EOF'
             echo "Deployment complete on Server 1:"
             ls -la "${{ secrets.REMOTE_PATH }}"
           EOF
 
-      - name: Deploy to Server 2
-        run: |
-          echo "Deploying to Server 2..."
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_2 }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
-          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_2 }}:${{ secrets.REMOTE_PATH }}"
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_2 }}" << 'EOF'
-            echo "Deployment complete on Server 2:"
-            ls -la "${{ secrets.REMOTE_PATH }}"
-          EOF
+      
 
