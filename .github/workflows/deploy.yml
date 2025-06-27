@@ -57,4 +57,6 @@ jobs:
       - name: Stop ssh-agent
         if: always()
         run: |
-          ssh-agent -k
+          if [ -n "$SSH_AGENT_PID" ]; then
+            ssh-agent -k
+          fi
