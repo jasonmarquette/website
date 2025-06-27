@@ -29,7 +29,7 @@ jobs:
 
       - name: Debug: Show fingerprint of private key used in GitHub Actions
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tee key > /dev/null
           chmod 600 key
           ssh-keygen -lf key
 
