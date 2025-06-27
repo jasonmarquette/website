@@ -1,15 +1,11 @@
 ---
-name: Deploy Static HTML Site and app.py
+name: Deploy Static HTML Site and app.py (Debug Enabled)
 
 on:
-  workflow_run:
-    workflows: ["Lint Code Base"]
-    types:
-      - completed
+  workflow_dispatch:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -27,12 +23,31 @@ jobs:
           echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
 
-      - name: Show fingerprint of private key used in GitHub Actions
+      # ✅ Show fingerprint of loaded key
+      - name: Debug: Show fingerprint of private key
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tee key > /dev/null
           chmod 600 key
           ssh-keygen -lf key
 
+      # ✅ Show what keys are actually loaded
+      - name: Debug: List keys loaded in ssh-agent
+        run: ssh-add -l
+
+      # ✅ Confirm user and host values are correct
+      - name: Debug: Print deployment user/host
+        run: |
+          echo "REMOTE_USER=${{ secrets.REMOTE_USER }}"
+          echo "REMOTE_HOST=${{ secrets.REMOTE_HOST }}"
+
+      # ✅ Verbose SSH connection test
+      - name: Debug: Attempt SSH connection (verbose)
+        run: |
+          ssh -v -o StrictHostKeyChecking=yes \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
+            "echo SSH connection successful"
+
+      # 🔁 Proceed with deployment (after debugging succeeds)
       - name: Deploy to Server
         run: |
           echo "Deploying static site..."
