@@ -1,4 +1,4 @@
-name: Deploy Static HTML Site
+name: Deploy Static HTML Site and app.py
 
 on:
   workflow_run:
@@ -15,26 +15,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up SSH
+      - name: Set up SSH agent
         run: |
-          mkdir -p "$HOME/.ssh"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
-          chmod 600 "$HOME/.ssh/id_rsa"
+          eval "$(ssh-agent -s)"
+          ssh-add <(echo "${{ secrets.SSH_PRIVATE_KEY }}")
 
       - name: Add known hosts
         run: |
-          ssh-keyscan -H "${{ secrets.REMOTE_HOST }}" >> "$HOME/.ssh/known_hosts"
-      
+          echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
 
-      - name: Deploy to Server 1
+      - name: Deploy to Server
         run: |
-          echo "Deploying to Server 1..."
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
-          rsync -az --delete -e "ssh -i \"$HOME/.ssh/id_rsa\" -o StrictHostKeyChecking=yes" ./ "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}"
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" << 'EOF'
-            echo "Deployment complete on Server 1:"
+          echo "Deploying static site to ${{ secrets.REMOTE_PATH }}..."
+          ssh -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" "mkdir -p '${{ secrets.REMOTE_PATH }}'"
+
+          rsync -az --delete -e "ssh -o StrictHostKeyChecking=yes" ./ \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}"
+
+          echo "Deploying app.py to /home/ec2-user..."
+          rsync -az -e "ssh -o StrictHostKeyChecking=yes" ./app.py \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/home/ec2-user/app.py"
+
+          ssh -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" << 'EOF'
+            chmod 755 /home/ec2-user/app.py
+            sync
+            echo "Deployment complete on server:"
+            echo "Static site contents:"
             ls -la "${{ secrets.REMOTE_PATH }}"
+            echo "app.py details:"
+            ls -la /home/ec2-user/app.py
           EOF
 
-      
-
+      - name: Stop ssh-agent
+        if: always()
+        run: |
+          ssh-agent -k
