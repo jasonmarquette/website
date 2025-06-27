@@ -27,6 +27,12 @@ jobs:
           echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
 
+      - name: Debug: Show fingerprint of private key used in GitHub Actions
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
+          chmod 600 key
+          ssh-keygen -lf key
+
       - name: Deploy to Server
         run: |
           echo "Deploying static site..."
