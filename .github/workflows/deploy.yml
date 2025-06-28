@@ -31,7 +31,7 @@ jobs:
               --exclude="keyfile" \
               --exclude="app.py" \
               --exclude="site.tar.gz" \
-              -czf site.tar.gz .
+              -czf site.tar.gz . || true
 
           echo "📤 Uploading archive via SCP..."
           scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes site.tar.gz \
