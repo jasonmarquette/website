@@ -25,7 +25,8 @@ jobs:
           ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
 
           echo "📦 Creating site archive..."
-          tar --exclude=".git" \
+          tar --warning=no-file-changed \
+              --exclude=".git" \
               --exclude=".github" \
               --exclude="keyfile" \
               --exclude="app.py" \
