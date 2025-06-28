@@ -37,7 +37,7 @@ jobs:
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/site.tar.gz"
 
           echo "📂 Extracting on remote server..."
-          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" << EOF
+          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" << 'EOF'
             mkdir -p "$REMOTE_PATH"
             tar -xzf /home/$REMOTE_USER/site.tar.gz -C "$REMOTE_PATH"
             rm /home/$REMOTE_USER/site.tar.gz
@@ -47,7 +47,7 @@ EOF
           scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes ./app.py \
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/app.py"
 
-          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" << EOF
+          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" << 'EOF'
             chmod 755 /home/$REMOTE_USER/app.py
             sync
             echo "✅ Deployment complete:"
