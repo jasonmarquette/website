@@ -33,20 +33,20 @@ jobs:
           echo "✅ REMOTE_HOST: $REMOTE_HOST"
 
           echo "✅ Testing SSH connection:"
-          ssh -A -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
+          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
 
           echo "📦 Deploying static site..."
-          ssh -A -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
+          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
             "mkdir -p '$REMOTE_PATH'"
 
-          rsync -az --delete -e "ssh -A -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" ./ \
+          rsync -az --delete -e "ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" ./ \
             "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH"
 
           echo "📦 Deploying app.py..."
-          rsync -az -e "ssh -A -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" ./app.py \
+          rsync -az -e "ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" ./app.py \
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/app.py"
 
-          ssh -A -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" << EOF
+          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" << EOF
             chmod 755 /home/$REMOTE_USER/app.py
             sync
             echo "✅ Deployment complete:"
