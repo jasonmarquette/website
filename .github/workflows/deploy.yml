@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up SSH and verify connection
+      - name: Deploy with SSH and rsync
         run: |
           mkdir -p "$HOME/.ssh"
           echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
@@ -35,14 +35,6 @@ jobs:
           echo "✅ Testing SSH connection:"
           ssh -A -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
 
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-
-      - name: Deploy files to server
-        run: |
           echo "📦 Deploying static site..."
           ssh -A -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
             "mkdir -p '$REMOTE_PATH'"
@@ -65,13 +57,8 @@ jobs:
           EOF
 
         env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
-
-      - name: Stop ssh-agent
-        if: always()
-        run: |
-          if [ -n "$SSH_AGENT_PID" ]; then
-            ssh-agent -k
-          fi
