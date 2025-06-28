@@ -14,15 +14,15 @@ jobs:
 
       - name: Deploy using Tar + SCP
         run: |
+          echo "📁 Setting up SSH environment..."
           mkdir -p "$HOME/.ssh"
+          echo "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_rsa"
+          chmod 600 "$HOME/.ssh/id_rsa"
           echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
 
-          eval "$(ssh-agent -s)"
-          echo "$SSH_PRIVATE_KEY" | ssh-add -
-
           echo "✅ Testing SSH connection..."
-          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
 
           echo "📦 Creating site archive..."
           tar --warning=no-file-changed \
@@ -34,19 +34,19 @@ jobs:
               -czf site.tar.gz . || true
 
           echo "📤 Uploading archive via SCP..."
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes site.tar.gz \
+          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes site.tar.gz \
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/site.tar.gz"
 
           echo "📂 Extracting on remote server..."
-          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
             "mkdir -p '$REMOTE_PATH' && tar -xzf /home/$REMOTE_USER/site.tar.gz -C '$REMOTE_PATH' && rm /home/$REMOTE_USER/site.tar.gz"
 
           echo "🚀 Deploying app.py..."
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes ./app.py \
+          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes ./app.py \
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/app.py"
 
           echo "📂 Setting permissions and verifying deployment..."
-          ssh -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
             "chmod 755 /home/$REMOTE_USER/app.py && sync && echo '✅ Deployment complete:' && ls -la '$REMOTE_PATH' && ls -la /home/$REMOTE_USER/app.py"
 
         env:
