@@ -3,102 +3,183 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The Ranch</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>My Portfolio</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
   <style>
-    body, html {
-      height: 100%;
-      margin: 0;
-    }
-    .hero-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
+    /* Hero section styling */
+    #hero {
       height: 100vh;
-      background-image: url('ranch.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      color: white;
+      background: url('hero.jpg') center center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .hero-content {
-      animation: fadeIn 1.5s ease-in-out;
+    #hero .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    #hero .content {
+      position: relative;
+      color: #fff;
+      text-align: center;
+      z-index: 2;
     }
-
-    /* Chatbot styles */
+    /* Section headings */
+    section h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+    /* Chat button and box styling */
     .chat-button {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background-color: #0d6efd;
-      color: white;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: #fff;
       border: none;
       border-radius: 50%;
       width: 60px;
       height: 60px;
-      font-size: 28px;
+      font-size: 1.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       z-index: 1000;
     }
-
     .chatbox {
       position: fixed;
-      bottom: 100px;
-      right: 30px;
+      bottom: 90px;
+      right: 20px;
       width: 300px;
-      max-height: 400px;
+      height: 400px;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       display: none;
       flex-direction: column;
-      overflow-y: auto; /* allow scroll within chatbox */
+      padding: 15px;
       z-index: 1000;
     }
-
-    .chatbox textarea {
-      resize: none;
-      width: 100%;
-      height: 60px;
-      margin-top: 10px;
-    }
-
     .chatbox .response-box {
-      background-color: #f1f1f1;
-      border-radius: 6px;
+      flex: 1;
+      background: #f1f1f1;
+      border-radius: 4px;
       padding: 10px;
-      margin-top: 10px;
-      min-height: 50px;
-      max-height: 200px;  /* keep responses contained */
-      font-size: 14px;
-      white-space: pre-wrap;
-      overflow-y: auto;  /* scroll if response is too long */
+      margin-bottom: 10px;
+      overflow-y: auto;
     }
-
+    .chatbox textarea {
+      width: 100%;
+      resize: none;
+      margin-bottom: 10px;
+    }
     .chatbox .send-btn {
-      margin-top: 5px;
       width: 100%;
     }
   </style>
 </head>
 <body>
-  <div class="hero-section">
-    <div class="hero-content">
-      <h1 class="display-3 fw-bold">Welcome to the Ranch.</h1>
-      <p class="lead">Check out my resume.</p>
-      <a href="resume.html" class="btn btn-light btn-lg mt-3">Resume</a>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">Jason Marquette</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
     </div>
-  </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero" class="position-relative">
+    <div class="overlay"></div>
+    <div class="content">
+      <h1 class="display-4">Hello, I'm MyName</h1>
+      <p class="lead">A Passionate Developer & Designer</p>
+      <a href="#portfolio" class="btn btn-primary btn-lg mt-3">View My Work</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-5">
+    <div class="container">
+      <h2 class="text-center">About Me</h2>
+      <div class="row align-items-center">
+        <div class="col-md-4 text-center">
+          <img src="ranch.jpg" class="img-fluid alt="Profile">
+        </div>
+        <div class="col-md-8">
+          <p>I'm a full-stack developer with a passion for building beautiful and functional web experiences. With X years of experience in HTML, CSS, JavaScript, and modern frameworks, I turn ideas into reality.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Section -->
+  <section id="portfolio" class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center">Portfolio</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Project Card -->
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="project1.jpg" class="card-img-top" alt="Project 1">
+            <div class="card-body">
+              <h5 class="card-title">Project Title 1</h5>
+              <p class="card-text">Short description of the project, technologies used, and the outcome.</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+              <a href="#" class="btn btn-outline-primary w-100">View Project</a>
+            </div>
+          </div>
+        </div>
+        <!-- Repeat similar blocks for more projects -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-5">
+    <div class="container">
+      <h2 class="text-center">Contact Me</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <form>
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label">Message</label>
+              <textarea class="form-control" id="message" rows="5" required></textarea>
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary">Send Message</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Floating Chat Button -->
   <button class="chat-button" onclick="toggleChat()">💬</button>
@@ -111,6 +192,21 @@
     <button class="btn btn-primary send-btn" onclick="sendPrompt()">Send</button>
   </div>
 
+  <!-- Footer -->
+  <footer class="py-4 bg-dark text-white text-center">
+    <div class="container">
+      <p class="mb-2">&copy; 2025 MyName. All Rights Reserved.</p>
+      <div>
+        <a href="#" class="text-white mx-2"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="text-white mx-2"><i class="bi bi-linkedin"></i></a>
+        <a href="#" class="text-white mx-2"><i class="bi bi-github"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chatbot Script -->
   <script>
     function toggleChat() {
       const chatbox = document.getElementById("chatbox");
@@ -136,7 +232,5 @@
       }
     }
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
