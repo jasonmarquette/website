@@ -17,70 +17,15 @@
       align-items: center;
       justify-content: center;
     }
-    #hero .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-    }
-    #hero .content {
-      position: relative;
-      color: #fff;
-      text-align: center;
-      z-index: 2;
-    }
-    section h2 {
-      margin-bottom: 1.5rem;
-      font-weight: 700;
-    }
+    #hero .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+    #hero .content { position: relative; color: #fff; text-align: center; z-index: 2; }
+    section h2 { margin-bottom: 1.5rem; font-weight: 700; }
     /* Chat styling */
-    .chat-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      z-index: 1000;
-    }
-    .chatbox {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 300px;
-      height: 400px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      display: none;
-      flex-direction: column;
-      padding: 15px;
-      z-index: 1000;
-    }
-    .chatbox .response-box {
-      flex: 1;
-      background: #f1f1f1;
-      border-radius: 4px;
-      padding: 10px;
-      margin-bottom: 10px;
-      overflow-y: auto;
-    }
-    .chatbox textarea {
-      width: 100%;
-      resize: none;
-      margin-bottom: 10px;
-    }
-    .chatbox .send-btn {
-      width: 100%;
-    }
+    .chat-button { position: fixed; bottom: 20px; right: 20px; background-color: #007bff; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
+    .chatbox { position: fixed; bottom: 90px; right: 20px; width: 300px; height: 400px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: none; flex-direction: column; padding: 15px; z-index: 1000; }
+    .chatbox .response-box { flex: 1; background: #f1f1f1; border-radius: 4px; padding: 10px; margin-bottom: 10px; overflow-y: auto; }
+    .chatbox textarea { width: 100%; resize: none; margin-bottom: 10px; }
+    .chatbox .send-btn { width: 100%; }
   </style>
 </head>
 <body>
@@ -183,20 +128,8 @@
           </ul>
         </div>
       </div>
-      <!-- Contact via Formspree 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="card-title">Contact Me</h2>
-          <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-            <div class="mb-3"><label for="name" class="form-label">Name</label><input type="text" name="name" id="name" class="form-control" required></div>
-            <div class="mb-3"><label for="email" class="form-label">Email</label><input type="email" name="email" id="email" class="form-control" required></div>
-            <div class="mb-3"><label for="message" class="form-label">Message</label><textarea name="message" id="message" class="form-control" rows="4" required></textarea></div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
-          </form>
-        </div>
-      </div>
     </div>
-  </section>-->
+  </section>
 
   <!-- Chat Button & Box -->
   <button class="chat-button" onclick="toggleChat()">💬</button>
