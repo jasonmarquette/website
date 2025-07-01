@@ -1,56 +1,55 @@
 from flask import Flask, request, jsonify
 import boto3
 import json
-import boto3
+from botocore.config import Config
 
-# To run this code, ensure you have Flask and boto3 installed:
-# pip install Flask boto3
-# Also, ensure you have configured your AWS credentials properly.
-# You can set them up using the AWS CLI or by creating a credentials file at ~/.aws
-# /credentials.
-# The credentials file should look like this:
-# [default]
-# aws_access_key_id = YOUR_ACCESS_KEY
-# aws_secret_access_key = YOUR_SECRET
+def init_bedrock_client():
+    """
+    Initialize the Bedrock client with a longer read timeout.
+    """
+    return boto3.client(
+        "bedrock-runtime",
+        region_name="us-east-1",   # use your Bedrock region
+        config=Config(read_timeout=300)
+    )
 
-# In my case, I put the credentials in the service.
-
-
-bedrock_client = boto3.client(
-    "bedrock-runtime",
-    region_name="us-east-1"   # use your Bedrock region
-)
-
+# Create one global client
+bedrock_client = init_bedrock_client()
 
 app = Flask(__name__)
-boto3.client("bedrock-runtime", region_name="us-east-1")
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    data = request.json
+    data = request.get_json() or {}
     user_prompt = data.get('prompt', '')
 
-    response = bedrock_client.invoke_model(
-        modelId='amazon.titan-text-express-v1',
-        contentType='application/json',
-        accept='application/json',
-        body=json.dumps({
-            "inputText": user_prompt,
-            "textGenerationConfig": {
-                "maxTokenCount": 3072,
-                "stopSequences": [],
-                "temperature": 0.7,
-                "topP": 0.9,
-            }
-        })
+    # 1. Build the messages array for a chat model
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"text": user_prompt}
+            ]
+        }
+    ]
+
+    # 2. Call the Converse API instead of invoke_model
+    response = bedrock_client.converse(
+        modelId="amazon.nova-pro-v1:0",   # or whatever chat-capable model you prefer
+        messages=messages,
+        inferenceConfig={
+            "temperature": 0.7,
+            "topP": 0.9,
+            "maxTokens": 1024
+        }
     )
 
-    raw_body = response['body'].read()
-    response_data = json.loads(raw_body)
-    output_text = response_data.get("results", [])[0].get("outputText", "No response received.")
+    # 3. Pull out the text chunks and stitch them together
+    output_message = response["output"]["message"]
+    text_parts = [chunk.get("text", "") for chunk in output_message["content"]]
+    bot_response = "".join(text_parts)
 
-    return jsonify({"response": output_text})
-
+    return jsonify({"response": bot_response})
 
 if __name__ == "__main__":
     app.run(port=5000)
