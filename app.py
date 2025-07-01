@@ -1,6 +1,6 @@
 import boto3
 from botocore.config import Config
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 
 
 def init_bedrock_client():
