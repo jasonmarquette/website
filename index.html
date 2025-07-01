@@ -4,18 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Portfolio</title>
-
   <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <!-- Bootstrap Icons -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-    rel="stylesheet"
-  />
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
   <style>
     /* Hero section styling */
     #hero {
@@ -39,13 +31,11 @@
       text-align: center;
       z-index: 2;
     }
-
     /* Section headings */
     section h2 {
       margin-bottom: 1.5rem;
       font-weight: 700;
     }
-
     /* Chat button and box styling */
     .chat-button {
       position: fixed;
@@ -97,29 +87,20 @@
     }
   </style>
 </head>
-
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
     <div class="container">
       <a class="navbar-brand" href="#">Jason Marquette</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbar-nav">
+      <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
           <li class="nav-item"><a class="nav-link" href="#resume">Resume</a></li>
-          <!-- <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li> -->
+          <!--<li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li> -->
         </ul>
       </div>
     </div>
@@ -130,7 +111,7 @@
     <div class="overlay"></div>
     <div class="content">
       <h1 class="display-4">Hello, I'm Jason Marquette</h1>
-      <!-- <p class="lead">A Passionate Developer & Designer</p> -->
+      <!--<p class="lead">A Passionate Developer & Designer</p> -->
       <a href="#resume" class="btn btn-primary btn-lg mt-3">View My Resume</a>
     </div>
   </section>
@@ -141,19 +122,10 @@
       <h2 class="text-center">About Me</h2>
       <div class="row align-items-center">
         <div class="col-md-4 text-center">
-          <img
-            src="jason-headshot.png"
-            class="img-fluid rounded-circle"
-            alt="Professional headshot of Jason Marquette"
-          >
+          <img src="jason-headshot.png" class="img-fluid" alt="Man wearing a white dress shirt and patterned tie standing in front of a tan brick wall, appearing professional and composed">
         </div>
         <div class="col-md-8">
-          <p>
-            I'm a dynamic operations and cloud leader with 20+ years of experience driving
-            enterprise technology transformation, cloud migration, and process optimization.
-            I align technical strategy with business goals to reduce costs and lead
-            large-scale modernization efforts.
-          </p>
+          <p>I'm a dynamic operations and cloud leader with 20+ years of experience driving enterprise technology transformation, cloud migration, and process optimization. I have a proven ability to align technical strategy with business goals, reduce operational costs, and lead cross-functional teams through large-scale modernization efforts.</p>
         </div>
       </div>
     </div>
@@ -162,113 +134,150 @@
   <!-- Resume Section -->
   <section id="resume" class="py-5 bg-light">
     <div class="container">
-      <!-- Top Contact / Title -->
-      <div class="text-center mb-4">
-        <h1>Jason Marquette</h1>
-        <p>
-          <a href="mailto:jasonmarquette@icloud.com">jasonmarquette@icloud.com</a> |
-          <a href="tel:+16127092449">(612) 709-2449</a> |
-          The Woodlands, TX
-        </p>
-        <p>Director of Operations | Cloud Solutions Architect | AWS Certified</p>
-      </div>
-
-      <!-- About Card -->
-      <div class="card mb-4">
+      <body>
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1>Jason Marquette</h1>
+            <p>Email: <a href="mailto:jasonmarquette@icloud.com">jasonmarquette@icloud.com</a> | 
+                Phone: <a href="tel:+16127092449">(612) 709-2449</a> | Location: The Woodlands, TX</p>
+            <p>Director of Operations | Cloud Solutions Architect | Strategic Cloud Migration &amp; Optimization | AWS Certified</p>
+                
+        </div>
+        
+        <div class="card mt-4">
         <div class="card-body">
-          <h2 class="card-title">About</h2>
-          <p>
-            Dynamic operations and cloud leader with 20+ years of experience in enterprise
-            technology transformation, cloud migration, and process optimization. Proven
-            ability to align technical strategy with business goals and drive cross-functional
-            teams through modernization efforts.
-          </p>
-        </div>
-      </div>
+         <h2 class="card-title">About</h2>
+        <ul class="list-unstyled mb-0">
+            <li>Dynamic operations and cloud leader with 20+ years of experience driving enterprise technology transformation, cloud migration, and process optimization. Proven ability to align technical strategy with 
+              business goals, reduce operational costs, and lead cross-functional teams through large-scale modernization efforts.</li>
+    </ul>
+  </div>
+</div>
 
-      <!-- Skills -->
-      <div class="row text-center mb-4">
-        <div class="col-md-4">
-          <h5>Core Skills</h5>
-          <ul class="list-unstyled">
-            <li>Project Management</li>
-            <li>Infrastructure Management</li>
-            <li>Stakeholder Relations</li>
-          </ul>
-        </div>
-        <div class="col-md-4">
-          <h5>Expertise</h5>
-          <ul class="list-unstyled">
-            <li>Process Optimization</li>
-            <li>Compliance Management</li>
-            <li>Cloud &amp; Automation</li>
-          </ul>
-        </div>
-        <div class="col-md-4">
-          <h5>Leadership</h5>
-          <ul class="list-unstyled">
-            <li>Team Leadership</li>
-            <li>Strategic Planning</li>
-            <li>Operational Oversight</li>
-          </ul>
-        </div>
-      </div>
 
-      <!-- Experience -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="card-title">Experience</h2>
-          <p><strong>Director of Operations</strong> – Health Safety Institute (Dec 2019 – May 2024)</p>
-          <ul>
-            <li>Led migration of on-prem workloads to AWS, reducing licensing costs by 33%.</li>
-            <li>Managed cross-functional teams to optimize Learning Management Systems.</li>
-            <li>Oversaw data migration to Azure, improving storage reliability.</li>
-          </ul>
-
-          <p><strong>Director of Operations</strong> – Martech Media (2013 – 2019)</p>
-          <ul>
-            <li>Built SaaS platform for B2B services; implemented AWS S3 Glacier backups.</li>
-            <li>Developed tooling reducing headcount by 25% via automation.</li>
-          </ul>
-
-          <!-- ...and so on for the rest of your roles... -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <ul>
+                        <li>Project Management</li>
+                        <li>Technology Infrastructure Management</li>
+                        <li>Stakeholder Relations</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul>
+                        <li>Process Optimization</li>
+                        <li>Business Development</li>
+                        <li>Contract &amp; Compliance Management</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul>
+                        <li>Cross-functional Team Leadership</li>
+                        <li>Strategic Planning</li>
+                        <li>Operational Oversight</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <!-- Certifications -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="card-title">Certifications</h2>
-          <ul>
-            <li>AWS Certified Solutions Architect – Associate</li>
-          </ul>
+        
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">Experience</h2>
+                <p><strong>Director of Operations</strong> - Health Safety Institute, The Woodlands TX (Dec 2019 – May 2024)</p>
+                <ul>
+                    <li>Oversaw sustainable and adaptable evolution of organization's technology infrastructure to meet current and future needs.</li>
+                    <li>Worked cross-department with product group to ensure gaps in Learning Management Systems were addressed and prioritized.</li>
+                    <li>Led an initiative to migrate outdated physical render machines to virtual machines, achieving significant cost savings through per-machine licensing reductions of 33%.</li>
+                    <li>Supervised the seamless data migration from legacy file servers to Azure, enhancing storage efficiency and reliability.</li>
+                    <li>Led project managers to systematically decrease contractor dependencies utilizing FTE utilization metrics. </li>
+                </ul>
+                <p><strong>Director of Operations</strong> - Martech Media (acquired by Health Safety Institute), The Woodlands TX (Aug 2013 - Dec 2019)</p>
+                <ul>
+                    <li>Implemented a custom SaaS solution to facilitate B2B services for our company</li>
+                    <li>Created off-site cloud storage backups using AWS S3 Glacier for secure, long-term data storage.</li>
+                    <li>Architected custom tool set, resulting in 25% reduction in headcount to optimize production processes.</li>
+                    <li>Scaled operational processes to support 10% growth in company size, demonstrating adaptability and strategic planning.</li>
+                </ul>
+                <p><strong>Senior Solution Engineer Specialist</strong> - Allianz Life, Minneapolis MN (May 2012 - Aug 2013)</p>
+                <ul>
+                    <li>Successfully led technical team in execution of Accenture Life Insurance Platform, reinforcing Allianz Life's commitment to innovative and efficient insurance solutions.</li>
+                    <li>Fostered collaborative environment across global teams, optimizing resource allocation and project timelines for maximum productivity.</li>
+                </ul>
+                <p><strong>Senior Manager, Enterprise Architecture</strong> - Best Buy, Minneapolis MN (Dec 2011 - May 2012)</p>
+                <ul>
+                    <li>Spearheaded development of company-wide Service-Oriented Architecture, resulting in enhanced system flexibility and reduced integration costs.</li>
+                    <li>Developed and standardized reference architectures, ensuring best practices across enterprise deployments and facilitating smoother system upgrades.</li>
+                    <li>Provided architectural leadership, promoting principles to drive integration and operational excellence within organization.</li>
+                </ul>
+                <p><strong>Senior Solution Engineer</strong> - Allianz Life, Minneapolis MN (Sep 2004 - Dec 2011)</p>
+                <ul>
+                    <li>Drove the architecture, product selection, and implementation of Enterprise Service Bus technology stack. The stack included: a registry, 
+                        messaging, orchestration, transformation tools, monitoring, and Web Service management.</li>
+                    <li>Delivered the implementation of our enterprise-wide SOA architecture resulting in the most mature adoption rate among all of Allianz’s entities.</li>
+                    <li>Managed multiple teams across the enterprise through an infrastructure related SOA architecture. This roll-out was on time and within budget.</li>
+                    <li>Managed global resources (Application Maintenance and Application Development).</li>
+                    <li>Led the implementation of a $500k enterprise scheduling solution for the entire company.</li>
+                </ul>
+                <p><strong>Lead</strong> - FICO, Minneapolis MN (Jan 2001 - Sep 2004)</p>
+                <ul>
+                    <li>Technical consultant responsible for the implementation of a new product line into an existing data warehouse system. Designed, coded, and tested extraction procedures for analyzing new marketing data.</li>
+                    <li>Responsible for overseeing a database conversion from Redbrick to Oracle.  The conversion increased overall system efficiency from two days to eight hours by creating custom stored procedures in place of legacy code.</li>
+                    <li>Co-Implemented an Enterprise Scheduler solution.</li>
+                    <li>Created custom Perl health monitoring and paging scripts which reduced mean time for batch processing.</li>
+                    <li>Developed operational efficiencies by creating and implementing standardized UNIX batch scripts. </li>
+                </ul>
+                <p><strong>Consultant</strong> - Accenture, Minneapolis MN (Jan 1999 - Jan 2001)</p>
+                <ul>
+                    <li>Consulted for Fortune 500 clients with a focus on building new revenue channels and reducing capital expenditures by leveraging technology.</li>
+                    <li>Technical consultant responsible for deployment of system test, production application, and database servers.  </li>
+                    <li>Created and implemented a 24x7 backup and recovery strategy. </li>
+                    <li>Performed system builds to support product-testing code integrity. The builds increased code coverage efficiency by creating custom testing suite for releases. </li>
+                </ul>
+            </div>
         </div>
-      </div>
-
-      <!-- Education -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="card-title">Education</h2>
-          <ul>
-            <li>North Dakota State University – B.S. MIS</li>
-            <li>University of North Dakota – B.B.A. Financial Management</li>
-          </ul>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">Certifications</h2>
+                <ul>
+                    <li><strong>AWS Certified Solution Architect Associate</strong></li>
+                </ul>
+            </div>
         </div>
-      </div>
-
-      <!-- Tech Proficiencies -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="card-title">Technical Proficiencies</h2>
-          <ul>
-            <li>Python, Bash, Perl, C#, SQL, PHP</li>
-            <li>AWS (EC2, S3, Lambda, VPC, RDS, CloudWatch), Linux/Windows Server</li>
-            <li>Oracle, MySQL, PostgreSQL, SQL Server</li>
-            <li>CI/CD, Virtualization, Networking</li>
-          </ul>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="card-title">Education</h2>
+                <ul>
+                    <li><strong>North Dakota State University</strong> - B.S. in Management Information Systems</li>
+                    <li><strong>University of North Dakota</strong> - B.B.A. in Financial Management</li>
+                    
+                </ul>
+            </div>
         </div>
-      </div>
+        
+        <div class="card mt-4" >
+            <div class="card-body" >
+                <h2 class="card-title">Technical Proficiencies</h2>
+                <ul>
+                    <li><bold>Languages &amp; Scripting:</bold> Python, Bash, Perl, C#, SQL, PHP</li>
+                    <li><bold>Cloud &amp; Infrastructure:</bold> AWS(EC2, S3, Glacier, IAM, RDS, Lambda, VPC, CloudWatch), VMWare, UNIX/Linux, Windows Server</li>
+                    <li><bold>Databases:</bold> Oracle, MySQL, PostgreSQL, Microsoft SQL Server</li>
+                    <li><bold>Tools &amp; Technologies:</bold> MQ, TCP/IP, Virtualization, CI/CD Pipelines</li>
+                </ul>
+            </div>
+        </div>
+        <p></p>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+        
+         
+      </div>
+
   </section>
 
   <!-- Floating Chat Button -->
@@ -277,17 +286,49 @@
   <!-- Chatbox -->
   <div class="chatbox" id="chatbox">
     <strong>Ranch Bot</strong>
-    <div id="response" class="response-box">
-      I'm a textbot, ask me a basic question...
-    </div>
+    <div id="response" class="response-box">I'm a textbot, ask me a basic question...</div>
     <textarea id="prompt" placeholder="Type your message..."></textarea>
     <button class="btn btn-primary send-btn" onclick="sendPrompt()">Send</button>
   </div>
 
   <!-- Footer -->
-  <footer class="py-4 bg-dark text-white text-center mt-5">
+  <footer class="py-4 bg-dark text-white text-center">
     <div class="container">
       <p class="mb-2">&copy; 2025 Jason Marquette. All Rights Reserved.</p>
       <div>
         <a href="https://www.linkedin.com/in/jasonmarquette/" class="text-white mx-2"><i class="bi bi-linkedin"></i></a>
-        <a href="https://www.github.com/jasonmar
+        <a href="https://www.github.com/jasonmarquette" class="text-white mx-2"><i class="bi bi-github"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chatbot Script -->
+  <script>
+    function toggleChat() {
+      const chatbox = document.getElementById("chatbox");
+      chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
+    }
+
+    async function sendPrompt() {
+      const prompt = document.getElementById("prompt").value;
+      const responseBox = document.getElementById("response");
+      responseBox.innerText = "Thinking...";
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+        responseBox.innerText = data.response || data.error || "No response.";
+      } catch (err) {
+        responseBox.innerText = "Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
