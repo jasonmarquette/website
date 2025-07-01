@@ -3,7 +3,7 @@ from botocore.config import Config
 from flask import (
     Flask,
     jsonify,
-    request,
+    request
 )
 
 
