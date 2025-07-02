@@ -35,6 +35,7 @@ jobs:
               --exclude=".github" \
               --exclude="keyfile" \
               --exclude="app.py" \
+              --exclude="nginx.conf" \
               --exclude="site.tar.gz" \
               -czf site.tar.gz . || true
 
