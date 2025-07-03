@@ -315,7 +315,7 @@
 
   <!-- Chatbox -->
   <div class="chatbox" id="chatbox">
-    <div class="drag-handle" id="dragHandle">Ranch Bot</div>
+    <div class="drag-handle" id="drag-handle">Ranch Bot</div>
     <div id="response" class="response-box">I'm a textbot, ask me a basic question...</div>
     <textarea id="prompt" placeholder="Type your message..."></textarea>
     <button class="btn btn-primary send-btn" onclick="sendPrompt()">Send</button>
@@ -370,7 +370,7 @@
 
     // DRAG logic
     const chatbox = document.getElementById("chatbox");
-    const dragHandle = document.getElementById("dragHandle");
+    const dragHandle = document.getElementById("drag-handle");
     let dragStartX, dragStartY, dragBoxLeft, dragBoxTop, dragging = false;
 
     dragHandle.addEventListener("mousedown", function(e) {
