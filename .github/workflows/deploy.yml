@@ -5,7 +5,8 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows: ["Lint Code Base"]
-    types: [completed]
+    types:
+      - completed
 
 jobs:
   deploy:
@@ -16,66 +17,47 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup SSH keys and known hosts
+      - name: Deploy using Tar + SCP
         run: |
+          echo "📁 Setting up SSH environment..."
           mkdir -p "$HOME/.ssh"
           echo "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
           echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
 
-      - name: Test SSH connection
-        run: |
-          ssh -i "$HOME/.ssh/id_rsa" \
-            -o StrictHostKeyChecking=yes \
-            "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
+          echo "✅ Testing SSH connection..."
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
 
-      - name: Create tarball for static site (excluding files)
-        run: |
+          echo "📦 Creating site archive..."
           tar --warning=no-file-changed \
-            --exclude=".git" \
-            --exclude=".github" \
-            --exclude="keyfile" \
-            --exclude="app.py" \
-            --exclude="nginx.conf" \
-            --exclude="site.tar.gz" \
-            -czf site.tar.gz . || true
+              --exclude=".git" \
+              --exclude=".github" \
+              --exclude="keyfile" \
+              --exclude="app.py" \
+              --exclude="nginx.conf" \
+              --exclude="site.tar.gz" \
+              -czf site.tar.gz . || true
 
-      - name: Upload static site archive
-        run: |
-          scp -i "$HOME/.ssh/id_rsa" \
-            -o StrictHostKeyChecking=yes \
-            site.tar.gz "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/site.tar.gz"
+          echo "📤 Uploading archive via SCP..."
+          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes site.tar.gz \
+            "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/site.tar.gz"
 
-      - name: Extract archive on remote server
-        run: |
+          echo "📂 Extracting on remote server..."
           ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
             "mkdir -p '$REMOTE_PATH' && tar -xzf /home/$REMOTE_USER/site.tar.gz -C '$REMOTE_PATH' && rm /home/$REMOTE_USER/site.tar.gz"
 
-      - name: Upload app.py
-        run: |
-          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes \
-            ./app.py "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/app.py"
+          echo "🚀 Deploying app.py..."
+          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes ./app.py \
+            "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/app.py"
 
-      - name: Set permissions and verify deployment
-        run: |
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "
-            chmod 755 '$REMOTE_PATH/app.py' &&
-            sync &&
-            echo '✅ Deployment complete:' &&
-            ls -la '$REMOTE_PATH'
-          "
+          echo "📂 Setting permissions and verifying deployment..."
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
+            "chmod 755 /home/$REMOTE_USER/app.py && sync && echo '✅ Deployment complete:' && ls -la '$REMOTE_PATH' && ls -la /home/$REMOTE_USER/app.py"
 
-      - name: Restart Gunicorn service
-        run: |
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "
-            sudo systemctl restart marquetteranch.service &&
-            sudo systemctl status marquetteranch.service --no-pager
-          "
-
-    env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
-      REMOTE_USER: ${{ secrets.REMOTE_USER }}
-      REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-      REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
