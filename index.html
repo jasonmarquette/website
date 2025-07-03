@@ -64,7 +64,7 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       display: none;
       flex-direction: column;
-      padding: 15px;
+      padding: 0;
       z-index: 1000;
       resize: none;           /* disable native resize */
       min-width: 280px;
@@ -73,12 +73,28 @@
       max-height: 90vh;
       overflow: hidden;
     }
+    .drag-handle {
+      width: 100%;
+      height: 40px;
+      background: #f5f5f5;
+      cursor: move;
+      border-radius: 8px 8px 0 0;
+      font-weight: 600;
+      color: #007bff;
+      display: flex;
+      align-items: center;
+      padding-left: 16px;
+      user-select: none;
+      border-bottom: 1px solid #e4e7ed;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
     .chatbox .response-box {
       flex: 1;
       background: #f1f1f1;
       border-radius: 4px;
       padding: 10px;
-      margin-bottom: 10px;
+      margin: 12px;
       overflow-y: auto;
       min-height: 120px;
       max-height: 400px;
@@ -91,6 +107,7 @@
     }
     .chatbox .send-btn {
       width: 100%;
+      margin-bottom: 10px;
     }
     /* Custom resize handle */
     .resize-handle {
@@ -298,7 +315,7 @@
 
   <!-- Chatbox -->
   <div class="chatbox" id="chatbox">
-    <strong>Ranch Bot</strong>
+    <div class="drag-handle" id="dragHandle">Ranch Bot</div>
     <div id="response" class="response-box">I'm a textbot, ask me a basic question...</div>
     <textarea id="prompt" placeholder="Type your message..."></textarea>
     <button class="btn btn-primary send-btn" onclick="sendPrompt()">Send</button>
@@ -318,41 +335,75 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Chatbot and Resize Script -->
+  <!-- Chatbot Drag & Resize Script -->
   <script>
     function toggleChat() {
       const chatbox = document.getElementById("chatbox");
       chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
       if (chatbox.style.display === "flex") {
-        chatbox.style.flexDirection = "column"; // keep layout vertical
+        chatbox.style.flexDirection = "column";
       }
     }
 
     async function sendPrompt() {
-  const prompt = document.getElementById("prompt").value;
-  const responseBox = document.getElementById("response");
-  responseBox.innerText = "Thinking...";
+      const prompt = document.getElementById("prompt").value;
+      const responseBox = document.getElementById("response");
+      responseBox.innerText = "Thinking...";
 
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt })
-    });
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
 
-    if (!res.ok) {
-      throw new Error("Server error: " + res.status);
+        if (!res.ok) {
+          throw new Error("Server error: " + res.status);
+        }
+
+        const data = await res.json();
+        responseBox.innerText = data.response || data.error || "No response.";
+      } catch (err) {
+        responseBox.innerText = "Error: " + err.message;
+      }
     }
 
-    const data = await res.json();
-    responseBox.innerText = data.response || data.error || "No response.";
-  } catch (err) {
-    responseBox.innerText = "Error: " + err.message;
-  }
-}
-
-    // Custom resize handle logic
+    // DRAG logic
     const chatbox = document.getElementById("chatbox");
+    const dragHandle = document.getElementById("dragHandle");
+    let dragStartX, dragStartY, dragBoxLeft, dragBoxTop, dragging = false;
+
+    dragHandle.addEventListener("mousedown", function(e) {
+      dragging = true;
+      const rect = chatbox.getBoundingClientRect();
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragBoxLeft = rect.left;
+      dragBoxTop = rect.top;
+      document.body.style.userSelect = "none";
+    });
+
+    window.addEventListener("mousemove", function(e) {
+      if (!dragging) return;
+      let left = dragBoxLeft + (e.clientX - dragStartX);
+      let top = dragBoxTop + (e.clientY - dragStartY);
+      left = Math.max(0, Math.min(window.innerWidth - chatbox.offsetWidth, left));
+      top = Math.max(0, Math.min(window.innerHeight - chatbox.offsetHeight, top));
+      chatbox.style.left = left + "px";
+      chatbox.style.top = top + "px";
+      chatbox.style.right = "auto";
+      chatbox.style.bottom = "auto";
+      chatbox.style.position = "fixed";
+    });
+
+    window.addEventListener("mouseup", function() {
+      if (dragging) {
+        dragging = false;
+        document.body.style.userSelect = "";
+      }
+    });
+
+    // RESIZE logic
     const resizeHandle = chatbox.querySelector(".resize-handle");
     let isResizing = false, lastX = 0, lastY = 0, startWidth = 0, startHeight = 0;
 
