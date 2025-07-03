@@ -329,15 +329,27 @@
     }
 
     async function sendPrompt() {
-      const prompt = document.getElementById("prompt").value;
-      const responseBox = document.getElementById("response");
-      responseBox.innerText = "Thinking...";
+  const prompt = document.getElementById("prompt").value;
+  const responseBox = document.getElementById("response");
+  responseBox.innerText = "Thinking...";
 
-      // Replace with your actual API call here!
-      setTimeout(() => {
-        responseBox.innerText = "You said: " + prompt;
-      }, 700);
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!res.ok) {
+      throw new Error("Server error: " + res.status);
     }
+
+    const data = await res.json();
+    responseBox.innerText = data.response || data.error || "No response.";
+  } catch (err) {
+    responseBox.innerText = "Error: " + err.message;
+  }
+}
 
     // Custom resize handle logic
     const chatbox = document.getElementById("chatbox");
