@@ -338,12 +338,19 @@
   <!-- Chatbot Drag & Resize Script -->
   <script>
     function toggleChat() {
-      const chatbox = document.getElementById("chatbox");
-      chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
-      if (chatbox.style.display === "flex") {
-        chatbox.style.flexDirection = "column";
-      }
-    }
+  const chatbox = document.getElementById("chatbox");
+  const responseBox = document.getElementById("response");
+  const promptBox = document.getElementById("prompt");
+  const opening = chatbox.style.display !== "flex";
+  chatbox.style.display = opening ? "flex" : "none";
+  if (opening) {
+    chatbox.style.flexDirection = "column";
+  } else {
+    // Clear the chatbot window content when closing
+    responseBox.innerText = "I'm a textbot, ask me a basic question...";
+    promptBox.value = "";
+  }
+}
 
     async function sendPrompt() {
       const prompt = document.getElementById("prompt").value;
