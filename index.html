@@ -66,7 +66,7 @@
       flex-direction: column;
       padding: 0;
       z-index: 1000;
-      resize: none;           /* disable native resize */
+      resize: none;
       min-width: 280px;
       min-height: 200px;
       max-width: 90vw;
@@ -109,7 +109,6 @@
       width: 100%;
       margin-bottom: 10px;
     }
-    /* Custom resize handle */
     .resize-handle {
       position: absolute;
       width: 24px;
@@ -131,6 +130,30 @@
       right: 2px;
       bottom: 2px;
       border-radius: 0 0 6px 0;
+    }
+
+    /* --- MOBILE OVERRIDE FOR CHATBOX --- */
+    @media (max-width: 600px) {
+      .chatbox {
+        left: 0 !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        min-width: 100vw !important;
+        min-height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        z-index: 9999 !important;
+      }
+      .resize-handle,
+      .drag-handle {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -337,20 +360,26 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Chatbot Drag & Resize Script -->
   <script>
+    function isMobile() {
+      return window.innerWidth <= 600;
+    }
+
     function toggleChat() {
-  const chatbox = document.getElementById("chatbox");
-  const responseBox = document.getElementById("response");
-  const promptBox = document.getElementById("prompt");
-  const opening = chatbox.style.display !== "flex";
-  chatbox.style.display = opening ? "flex" : "none";
-  if (opening) {
-    chatbox.style.flexDirection = "column";
-  } else {
-    // Clear the chatbot window content when closing
-    responseBox.innerText = "I'm a textbot, ask me a basic question...";
-    promptBox.value = "";
-  }
-}
+      const chatbox = document.getElementById("chatbox");
+      const responseBox = document.getElementById("response");
+      const promptBox = document.getElementById("prompt");
+      const opening = chatbox.style.display !== "flex";
+      chatbox.style.display = opening ? "flex" : "none";
+      if (opening) {
+        chatbox.style.flexDirection = "column";
+        // On mobile, scroll to top so user sees the chat
+        if (isMobile()) window.scrollTo(0, 0);
+      } else {
+        // Clear the chatbot window content when closing
+        responseBox.innerText = "I'm a textbot, ask me a basic question...";
+        promptBox.value = "";
+      }
+    }
 
     async function sendPrompt() {
       const prompt = document.getElementById("prompt").value;
@@ -381,6 +410,7 @@
     let dragStartX, dragStartY, dragBoxLeft, dragBoxTop, dragging = false;
 
     dragHandle.addEventListener("mousedown", function(e) {
+      if (isMobile()) return; // Disable dragging on mobile
       dragging = true;
       const rect = chatbox.getBoundingClientRect();
       dragStartX = e.clientX;
@@ -415,6 +445,7 @@
     let isResizing = false, lastX = 0, lastY = 0, startWidth = 0, startHeight = 0;
 
     resizeHandle.addEventListener("mousedown", function(e) {
+      if (isMobile()) return; // Disable resizing on mobile
       e.preventDefault();
       isResizing = true;
       lastX = e.clientX;
