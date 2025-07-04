@@ -2,12 +2,14 @@ import boto3
 from botocore.config import Config
 from flask import Flask, jsonify, request
 
+
 def init_bedrock_agent_runtime_client():
     return boto3.client(
         "bedrock-agent-runtime",
         region_name="us-east-1",
-        config=Config(read_timeout=300)
+        config=Config(read_timeout=300),
     )
+
 
 # Replace with your actual Knowledge Base ID and Model ARN
 KNOWLEDGE_BASE_ID = "EVOLHELSIJ"
@@ -16,6 +18,7 @@ MODEL_ARN = "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0"
 bedrock_client = init_bedrock_agent_runtime_client()
 
 app = Flask(__name__)
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -39,6 +42,7 @@ def chat():
         return jsonify({"response": bot_response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(port=5000)
