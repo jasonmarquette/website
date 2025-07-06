@@ -1,7 +1,8 @@
+import json
+
 import boto3
 from botocore.config import Config
 from flask import Flask, jsonify, request
-import json
 
 
 def init_bedrock_agent_runtime_client():
