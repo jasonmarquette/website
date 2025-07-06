@@ -8,111 +8,250 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
   <style>
-    /* Hero section styling */
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #fafafc;
+      color: #111;
+      font-size: 1.09rem;
+      scroll-behavior: smooth;
+    }
+    .navbar {
+      background: #fff !important;
+      box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04);
+      border-bottom: 1px solid #eee;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 0;
+      color: #111 !important;
+    }
+    .nav-link {
+      color: #111 !important;
+      font-weight: 500;
+      font-size: 1.06rem;
+      margin-right: 10px;
+      transition: color 0.15s;
+    }
+    .nav-link.active, .nav-link:hover {
+      color: #0071e3 !important;
+    }
+    /* Hero section */
     #hero {
-      height: 100vh;
-      background: url('ranch.jpg') center center/cover no-repeat;
+      min-height: 88vh;
+      background: #fafbfc url('ranch.jpg') center center/cover no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
-    #hero .overlay {
+    #hero::before {
+      content: "";
+      background: rgba(255,255,255,0.62);
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
+      inset: 0;
+      z-index: 1;
     }
     #hero .content {
       position: relative;
-      color: #fff;
-      text-align: center;
       z-index: 2;
+      text-align: center;
+      padding: 2.5rem 1.2rem;
     }
-    section h2 {
-      margin-bottom: 1.5rem;
+    #hero .display-4 {
       font-weight: 700;
+      font-size: 3.1rem;
+      color: #111;
+      letter-spacing: 0;
+      margin-bottom: .7rem;
     }
-    /* Chat button and chatbox */
+    #hero .lead {
+      color: #555;
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+    #hero .btn-primary {
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 0.72rem 2.1rem;
+      font-size: 1.18rem;
+      font-weight: 500;
+      transition: background 0.16s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
+    #hero .btn-primary:hover {
+      background: #0071e3;
+      color: #fff;
+    }
+    /* Section headers */
+    section h2, .card-title {
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-bottom: 1.5rem;
+      color: #222;
+      font-size: 2.1rem;
+      text-align: center;
+    }
+    /* About Section */
+    #about img {
+      border-radius: 18px;
+      border: 2px solid #eaeaea;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      margin-bottom: 1rem;
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      background: #fff;
+      transition: box-shadow .18s;
+    }
+    #about img:hover {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+    }
+    #about p {
+      font-size: 1.17rem;
+      color: #313131;
+    }
+    /* Resume Cards */
+    .card {
+      border-radius: 22px;
+      border: 1px solid #eee;
+      background: #fff;
+      box-shadow: 0 2px 18px 0 rgba(0,0,0,0.06);
+      margin-bottom: 2rem;
+      transition: box-shadow 0.15s;
+    }
+    .card:hover {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+    }
+    .card-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .card-body ul {
+      padding-left: 1.3rem;
+    }
+    .skills-list ul {
+      list-style: none;
+      padding: 0;
+      text-align: center;
+    }
+    .skills-list li {
+      display: inline-block;
+      background: #f5f7fa;
+      color: #333;
+      border-radius: 16px;
+      padding: 8px 20px;
+      margin: 0 6px 10px 0;
+      font-size: 1.01rem;
+      font-weight: 500;
+      border: 1px solid #e9ecef;
+    }
+    /* Chat button and chatbox (more subtle) */
     .chat-button {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #007bff;
+      bottom: 22px;
+      right: 22px;
+      background: #111;
       color: #fff;
       border: none;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 1.5rem;
+      width: 56px;
+      height: 56px;
+      font-size: 1.8rem;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.09);
       z-index: 1000;
+      transition: transform 0.13s;
     }
+    .chat-button:hover { transform: scale(1.06); background: #0071e3; }
     .chatbox {
       position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 400px;
-      height: 600px;
+      bottom: 86px;
+      right: 22px;
+      width: 360px;
+      height: 520px;
       background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      border-radius: 18px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.11);
       display: none;
       flex-direction: column;
       padding: 0;
       z-index: 1000;
-      resize: none;
-      min-width: 280px;
+      min-width: 260px;
       min-height: 200px;
-      max-width: 90vw;
-      max-height: 90vh;
+      max-width: 95vw;
+      max-height: 92vh;
       overflow: hidden;
+      animation: fadeInDown 0.25s cubic-bezier(.43,.01,.38,1.01);
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-18px);}
+      to   { opacity: 1; transform: none;}
     }
     .drag-handle {
       width: 100%;
-      height: 40px;
-      background: #f5f5f5;
+      height: 44px;
+      background: #f7faff;
       cursor: move;
-      border-radius: 8px 8px 0 0;
-      font-weight: 600;
-      color: #007bff;
+      border-radius: 18px 18px 0 0;
+      font-weight: 700;
+      color: #111;
       display: flex;
       align-items: center;
-      padding-left: 16px;
+      padding-left: 18px;
       user-select: none;
       border-bottom: 1px solid #e4e7ed;
       font-size: 1.1rem;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.2px;
     }
     .chatbox .response-box {
       flex: 1;
-      background: #f1f1f1;
+      background: #f5f7fa;
       border-radius: 4px;
-      padding: 10px;
-      margin: 12px;
+      padding: 14px;
+      margin: 15px 14px 8px 14px;
       overflow-y: auto;
       min-height: 120px;
-      max-height: 400px;
+      max-height: 340px;
+      font-size: 1.04rem;
+      color: #222;
     }
     .chatbox textarea {
-      width: 100%;
+      width: 92%;
       resize: none;
-      margin-bottom: 10px;
+      margin: 0 12px 12px 12px;
       min-height: 50px;
+      border-radius: 12px;
+      border: 1px solid #e0e3e9;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 1.04rem;
     }
     .chatbox .send-btn {
-      width: 100%;
-      margin-bottom: 10px;
+      width: 92%;
+      margin: 0 12px 16px 12px;
+      border-radius: 22px;
+      font-weight: 500;
+      background: #111;
+      border: none;
+      transition: background .14s;
+      font-size: 1.09rem;
+    }
+    .chatbox .send-btn:hover {
+      background: #0071e3;
+      color: #fff;
     }
     .resize-handle {
       position: absolute;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       right: 0;
       bottom: 0;
       cursor: se-resize;
@@ -122,55 +261,52 @@
     .resize-handle:after {
       content: "";
       display: block;
-      width: 16px;
-      height: 16px;
-      border-right: 3px solid #007bff;
-      border-bottom: 3px solid #007bff;
+      width: 15px;
+      height: 15px;
+      border-right: 2.5px solid #bbb;
+      border-bottom: 2.5px solid #bbb;
       position: absolute;
       right: 2px;
       bottom: 2px;
       border-radius: 0 0 6px 0;
     }
-
-    /* --- MOBILE OVERRIDE FOR CHATBOX --- */
+    /* MOBILE CHAT OVERRIDE */
     @media (max-width: 600px) {
       .chatbox {
-        left: 0 !important;
-        top: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        min-width: 100vw !important;
-        min-height: 100vh !important;
-        max-width: 100vw !important;
-        max-height: 100vh !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        z-index: 9999 !important;
+        left: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        min-width: 100vw !important; min-height: 100vh !important;
+        max-width: 100vw !important; max-height: 100vh !important;
+        border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; z-index: 9999 !important;
       }
-      .resize-handle,
-      .drag-handle {
-        display: none !important;
-      }
+      .resize-handle, .drag-handle { display: none !important; }
     }
+    /* Footer */
+    footer {
+      background: #fff;
+      color: #888;
+      font-size: 1.07rem;
+      margin-top: 3rem;
+      box-shadow: 0 -1px 8px 0 rgba(0,0,0,0.03);
+      border-top: 1px solid #eee;
+    }
+    footer a {
+      color: #0071e3;
+      opacity: .8;
+      transition: opacity .15s;
+      font-size: 1.25rem;
+      margin: 0 5px;
+    }
+    footer a:hover { opacity: 1; color: #111; }
   </style>
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
     <div class="container">
       <a class="navbar-brand" href="#">Jason Marquette</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbar-nav"
-        aria-controls="navbar-nav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-nav"
+        aria-controls="navbar-nav" aria-expanded="false" aria-label="Toggle navigation" >
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbar-nav">
@@ -184,20 +320,20 @@
 
   <!-- Hero Section -->
   <section id="hero" class="position-relative">
-    <div class="overlay"></div>
     <div class="content">
-      <h1 class="display-4">Hello, I'm Jason Marquette</h1>
-      <a href="#resume" class="btn btn-primary btn-lg mt-3">View My Resume</a>
+      <h1 class="display-4 mb-3">Hello, I'm Jason Marquette</h1>
+      <div class="lead mb-4">Director of Operations &bull; Cloud Solutions Architect</div>
+      <a href="#resume" class="btn btn-primary btn-lg mt-2 shadow">View My Resume</a>
     </div>
   </section>
 
   <!-- About Section -->
   <section id="about" class="py-5">
     <div class="container">
-      <h2 class="text-center">About Me</h2>
+      <h2>About Me</h2>
       <div class="row align-items-center">
         <div class="col-md-4 text-center">
-          <img src="jason-headshot.png" class="img-fluid" alt="Professional headshot of Jason Marquette">
+          <img src="jason-headshot.png" class="img-fluid shadow" alt="Professional headshot of Jason Marquette">
         </div>
         <div class="col-md-8">
           <p>I'm a dynamic operations and cloud leader with 20+ years of experience driving enterprise technology transformation, cloud migration, and process optimization. I have a proven ability to align technical strategy with business goals, reduce operational costs, and lead cross-functional teams through large-scale modernization efforts.</p>
@@ -209,13 +345,15 @@
   <!-- Resume Section -->
   <section id="resume" class="py-5 bg-light">
     <div class="container">
-      <div class="text-center">
-        <h1>Jason Marquette</h1>
-        <p>Email: <a href="mailto:jasonmarquette@icloud.com">jasonmarquette@icloud.com</a> | 
-           Phone: <a href="tel:+16127092449">(612) 709-2449</a> | Location: The Woodlands, TX</p>
+      <div class="text-center mb-4">
+        <h1 class="fw-bold" style="color:#111;">Jason Marquette</h1>
+        <p>
+          <i class="bi bi-envelope"></i> <a href="mailto:jasonmarquette@icloud.com">jasonmarquette@icloud.com</a> &nbsp; | &nbsp;
+          <i class="bi bi-phone"></i> <a href="tel:+16127092449">(612) 709-2449</a> &nbsp; | &nbsp; <i class="bi bi-geo-alt"></i> The Woodlands, TX
+        </p>
         <p>Director of Operations | Cloud Solutions Architect | Strategic Cloud Migration &amp; Optimization | AWS Certified</p>
       </div>
-      <div class="card mt-4">
+      <div class="card">
         <div class="card-body">
           <h2 class="card-title">About</h2>
           <ul class="list-unstyled mb-0">
@@ -223,12 +361,12 @@
           </ul>
         </div>
       </div>
-      <div class="container mt-4">
-        <div class="row">
+      <div class="container mt-4 skills-list">
+        <div class="row justify-content-center">
           <div class="col-md-4">
             <ul>
               <li>Project Management</li>
-              <li>Technology Infrastructure Management</li>
+              <li>Technology Infrastructure</li>
               <li>Stakeholder Relations</li>
             </ul>
           </div>
@@ -236,12 +374,12 @@
             <ul>
               <li>Process Optimization</li>
               <li>Business Development</li>
-              <li>Contract &amp; Compliance Management</li>
+              <li>Compliance Management</li>
             </ul>
           </div>
           <div class="col-md-4">
             <ul>
-              <li>Cross-functional Team Leadership</li>
+              <li>Team Leadership</li>
               <li>Strategic Planning</li>
               <li>Operational Oversight</li>
             </ul>
@@ -334,7 +472,7 @@
   </section>
 
   <!-- Floating Chat Button -->
-  <button class="chat-button" onclick="toggleChat()">💬</button>
+  <button class="chat-button" onclick="toggleChat()" aria-label="Open Chat"><i class="bi bi-chat-dots"></i></button>
 
   <!-- Chatbox -->
   <div class="chatbox" id="chatbox">
@@ -346,12 +484,12 @@
   </div>
 
   <!-- Footer -->
-  <footer class="py-4 bg-dark text-white text-center">
+  <footer class="py-4 text-center">
     <div class="container">
       <p class="mb-2">&copy; 2025 Jason Marquette. All Rights Reserved.</p>
       <div>
-        <a href="https://www.linkedin.com/in/jasonmarquette/" class="text-white mx-2"><i class="bi bi-linkedin"></i></a>
-        <a href="https://www.github.com/jasonmarquette" class="text-white mx-2"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/jasonmarquette/" target="_blank" rel="noopener"><i class="bi bi-linkedin"></i></a>
+        <a href="https://www.github.com/jasonmarquette" target="_blank" rel="noopener"><i class="bi bi-github"></i></a>
       </div>
     </div>
   </footer>
@@ -363,7 +501,6 @@
     function isMobile() {
       return window.innerWidth <= 600;
     }
-
     function toggleChat() {
       const chatbox = document.getElementById("chatbox");
       const responseBox = document.getElementById("response");
@@ -372,45 +509,35 @@
       chatbox.style.display = opening ? "flex" : "none";
       if (opening) {
         chatbox.style.flexDirection = "column";
-        // On mobile, scroll to top so user sees the chat
         if (isMobile()) window.scrollTo(0, 0);
       } else {
-        // Clear the chatbot window content when closing
         responseBox.innerText = "I'm a textbot, ask me a basic question...";
         promptBox.value = "";
       }
     }
-
     async function sendPrompt() {
       const prompt = document.getElementById("prompt").value;
       const responseBox = document.getElementById("response");
       responseBox.innerText = "Thinking...";
-
       try {
         const res = await fetch("/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt })
         });
-
-        if (!res.ok) {
-          throw new Error("Server error: " + res.status);
-        }
-
+        if (!res.ok) throw new Error("Server error: " + res.status);
         const data = await res.json();
         responseBox.innerText = data.response || data.error || "No response.";
       } catch (err) {
         responseBox.innerText = "Error: " + err.message;
       }
     }
-
     // DRAG logic
     const chatbox = document.getElementById("chatbox");
     const dragHandle = document.getElementById("drag-handle");
     let dragStartX, dragStartY, dragBoxLeft, dragBoxTop, dragging = false;
-
     dragHandle.addEventListener("mousedown", function(e) {
-      if (isMobile()) return; // Disable dragging on mobile
+      if (isMobile()) return;
       dragging = true;
       const rect = chatbox.getBoundingClientRect();
       dragStartX = e.clientX;
@@ -419,7 +546,6 @@
       dragBoxTop = rect.top;
       document.body.style.userSelect = "none";
     });
-
     window.addEventListener("mousemove", function(e) {
       if (!dragging) return;
       let left = dragBoxLeft + (e.clientX - dragStartX);
@@ -432,20 +558,17 @@
       chatbox.style.bottom = "auto";
       chatbox.style.position = "fixed";
     });
-
     window.addEventListener("mouseup", function() {
       if (dragging) {
         dragging = false;
         document.body.style.userSelect = "";
       }
     });
-
     // RESIZE logic
     const resizeHandle = chatbox.querySelector(".resize-handle");
     let isResizing = false, lastX = 0, lastY = 0, startWidth = 0, startHeight = 0;
-
     resizeHandle.addEventListener("mousedown", function(e) {
-      if (isMobile()) return; // Disable resizing on mobile
+      if (isMobile()) return;
       e.preventDefault();
       isResizing = true;
       lastX = e.clientX;
@@ -454,18 +577,16 @@
       startHeight = chatbox.offsetHeight;
       document.body.style.userSelect = "none";
     });
-
     window.addEventListener("mousemove", function(e) {
       if (!isResizing) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
-      const minWidth = 280, minHeight = 200, maxWidth = window.innerWidth * 0.9, maxHeight = window.innerHeight * 0.9;
+      const minWidth = 260, minHeight = 200, maxWidth = window.innerWidth * 0.95, maxHeight = window.innerHeight * 0.92;
       let newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
       let newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight + dy));
       chatbox.style.width = newWidth + "px";
       chatbox.style.height = newHeight + "px";
     });
-
     window.addEventListener("mouseup", function() {
       if (isResizing) {
         isResizing = false;
