@@ -3,6 +3,7 @@ from botocore.config import Config
 from flask import Flask, jsonify, request
 import json
 
+
 def init_bedrock_agent_runtime_client():
     return boto3.client(
         "bedrock-agent-runtime",
@@ -10,12 +11,14 @@ def init_bedrock_agent_runtime_client():
         config=Config(read_timeout=300),
     )
 
+
 def init_bedrock_runtime_client():
     return boto3.client(
         "bedrock-runtime",
         region_name="us-east-1",
         config=Config(read_timeout=60),
     )
+
 
 # Knowledge Base info
 KNOWLEDGE_BASE_ID = "EVOLHELSIJ"
@@ -43,9 +46,11 @@ FALLBACK_KEYWORDS = [
     "i do not know",
 ]
 
+
 def is_fallback_response(text):
     text = text.lower()
     return any(kw in text for kw in FALLBACK_KEYWORDS)
+
 
 def query_knowledge_base(user_prompt):
     input_data = {
@@ -61,6 +66,7 @@ def query_knowledge_base(user_prompt):
     response = bedrock_client.retrieve_and_generate(**input_data)
     return response.get("output", {}).get("text", "")
 
+
 def query_foundation_model(user_prompt):
     body = {
         "inputText": user_prompt,
@@ -68,16 +74,17 @@ def query_foundation_model(user_prompt):
             "maxTokenCount": 512,
             "temperature": 0.7,
             "topP": 0.9,
-        }
+        },
     }
     response = runtime_client.invoke_model(
         modelId="amazon.titan-text-express-v1",
         contentType="application/json",
         accept="application/json",
-        body=json.dumps(body)
+        body=json.dumps(body),
     )
-    result = json.loads(response['body'].read())
+    result = json.loads(response["body"].read())
     return result.get("results", [{}])[0].get("outputText", "")
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -95,6 +102,7 @@ def chat():
             return jsonify({"response": kb_response, "source": "knowledge_base"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(port=5000)
