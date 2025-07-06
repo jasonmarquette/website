@@ -17,7 +17,7 @@ def init_bedrock_runtime_client():
         config=Config(read_timeout=60),
     )
 
-# Your Knowledge Base info
+# Knowledge Base info
 KNOWLEDGE_BASE_ID = "EVOLHELSIJ"
 MODEL_ARN = "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0"
 
@@ -26,12 +26,26 @@ runtime_client = init_bedrock_runtime_client()
 
 app = Flask(__name__)
 
-FALLBACK_PHRASES = [
-    "do not contain relevant data",
-    "cannot find sufficient information",
+FALLBACK_KEYWORDS = [
+    "cannot find",
+    "can not find",
     "no relevant data",
-    "didn't find"
+    "do not contain",
+    "didn't find",
+    "not sufficient information",
+    "do not contain any relevant information",
+    "unable to answer",
+    "cannot answer",
+    "no information available",
+    "do not have enough information",
+    "not able to answer",
+    "sorry, i cannot",
+    "i do not know",
 ]
+
+def is_fallback_response(text):
+    text = text.lower()
+    return any(kw in text for kw in FALLBACK_KEYWORDS)
 
 def query_knowledge_base(user_prompt):
     input_data = {
@@ -57,7 +71,7 @@ def query_foundation_model(user_prompt):
         }
     }
     response = runtime_client.invoke_model(
-        modelId="amazon.titan-text-express-v1",  # Use Titan for compatibility
+        modelId="amazon.titan-text-express-v1",
         contentType="application/json",
         accept="application/json",
         body=json.dumps(body)
@@ -74,8 +88,7 @@ def chat():
 
     try:
         kb_response = query_knowledge_base(user_prompt)
-        # If KB cannot answer, fallback to foundation model
-        if not kb_response or any(phrase in kb_response.lower() for phrase in FALLBACK_PHRASES):
+        if not kb_response or is_fallback_response(kb_response):
             fm_response = query_foundation_model(user_prompt)
             return jsonify({"response": fm_response, "source": "foundation_model"})
         else:
