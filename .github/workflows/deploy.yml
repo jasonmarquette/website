@@ -1,12 +1,10 @@
----
-name: Deploy Static HTML Site and app.py (Tar + SCP)
+name: Deploy Static HTML Site and app.py (rsync + sudo)
 
 on:
   workflow_dispatch:
   workflow_run:
     workflows: ["Lint Code Base"]
-    types:
-      - completed
+    types: [completed]
 
 jobs:
   deploy:
@@ -17,48 +15,71 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy using Tar + SCP
+      - name: Prepare SSH
         run: |
-          echo "📁 Setting up SSH environment..."
           mkdir -p "$HOME/.ssh"
           echo "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
           echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
 
-          echo "✅ Testing SSH connection..."
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH connection successful"
+      - name: Test SSH
+        run: |
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH OK on $(hostname)"
 
-          echo "📦 Creating site archive..."
-          tar --warning=no-file-changed \
-              --exclude=".git" \
-              --exclude=".github" \
-              --exclude="keyfile" \
-              --exclude="app.py" \
-              --exclude="nginx.conf" \
-              --exclude="site.tar.gz" \
-              --exclude="README.md" \
-              -czf site.tar.gz . || true
+      - name: Stage website to remote tmp dir (rsync)
+        run: |
+          RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=yes"
+          # Sync repo → remote tmp dir (user-writable)
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude "keyfile" \
+            --exclude "README.md" \
+            --exclude "nginx.conf" \
+            --exclude "site.tar.gz" \
+            --exclude "app.py" \
+            -e "$RSYNC_SSH" ./ "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/.deploy_tmp/"
 
-          echo "📤 Uploading archive via SCP..."
-          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes site.tar.gz \
-            "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/site.tar.gz"
+      - name: Promote to /usr/share/nginx/html (sudo) + set perms
+        run: |
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" bash -lc '
+            set -e
+            sudo mkdir -p /usr/share/nginx/html
+            # Promote staged files into live docroot (atomic-ish + cleans removed files)
+            sudo rsync -a --delete /home/$REMOTE_USER/.deploy_tmp/ /usr/share/nginx/html/
+            # Basic error pages to avoid noisy logs (if your repo doesn’t include them)
+            sudo bash -c '\''[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'\''
+            sudo bash -c '\''[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'\''
+            sudo chown -R nginx:nginx /usr/share/nginx/html
+            sudo restorecon -R /usr/share/nginx/html 2>/dev/null || true
+            # Reload nginx to pick up any changed assets (usually not required for static, but harmless)
+            sudo systemctl reload nginx || true
+            echo "Deployed to /usr/share/nginx/html:"
+            sudo ls -la /usr/share/nginx/html | head -n 30
+          '
 
-          echo "📂 Extracting on remote server..."
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
-            "mkdir -p '$REMOTE_PATH' && tar -xzf /home/$REMOTE_USER/site.tar.gz -C '$REMOTE_PATH' && rm /home/$REMOTE_USER/site.tar.gz"
-
-          echo "🚀 Deploying app.py..."
+      - name: Deploy app.py → /opt/marquetteranch/app.py (sudo) and restart service (optional)
+        run: |
           scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes ./app.py \
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/app.py"
-
-          echo "📂 Setting permissions and verifying deployment..."
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" \
-            "chmod 755 /home/$REMOTE_USER/app.py && sync && echo '✅ Deployment complete:' && ls -la '$REMOTE_PATH' && ls -la /home/$REMOTE_USER/app.py"
-
+          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" bash -lc '
+            set -e
+            sudo mkdir -p /opt/marquetteranch
+            sudo mv /home/$REMOTE_USER/app.py /opt/marquetteranch/app.py
+            sudo chown root:root /opt/marquetteranch/app.py
+            sudo chmod 755 /opt/marquetteranch/app.py
+            # If you have a Gunicorn service, restart it (set GUNICORN_SERVICE secret to your unit name)
+            if [ -n "$GUNICORN_SERVICE" ]; then
+              sudo systemctl restart "$GUNICORN_SERVICE" || true
+              sudo systemctl status "$GUNICORN_SERVICE" --no-pager -l || true
+            fi
+          '
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          GUNICORN_SERVICE: ${{ secrets.GUNICORN_SERVICE }}
+
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+      REMOTE_USER: ${{ secrets.REMOTE_USER }}
+      REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
