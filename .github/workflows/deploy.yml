@@ -1,9 +1,9 @@
-name: Deploy Static HTML Site and app.py (rsync + sudo)
+name: Deploy Static HTML Site and app.py
 
 on:
-  workflow_dispatch:        # manual trigger in GitHub UI
+  workflow_dispatch:
   # push:
-  #   branches: [ main ]    # ← uncomment to deploy on push to main
+  #   branches: [ main ]
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -14,31 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
       REMOTE_USER: ${{ secrets.REMOTE_USER }}
       REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-      # Optional: systemd unit name for your Flask/Gunicorn app (e.g., marquette-chat.service)
       GUNICORN_SERVICE: ${{ secrets.GUNICORN_SERVICE }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare SSH
+      - name: Rsync repo to remote staging (~/.deploy_tmp)
         run: |
           mkdir -p "$HOME/.ssh"
-          echo "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_rsa"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
-          echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
-
-      - name: Test SSH
-        run: |
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH OK on $(hostname)"
-
-      - name: Rsync repo → remote staging (~/.deploy_tmp)
-        run: |
           RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=yes"
           rsync -az --delete \
             --exclude ".git" \
@@ -50,42 +40,40 @@ jobs:
             -e "$RSYNC_SSH" ./ "$REMOTE_USER@$REMOTE_HOST:~/.deploy_tmp/"
 
       - name: Promote staging → /usr/share/nginx/html (sudo) + reload nginx
-        run: |
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" 'bash -s' <<'REMOTE_EOF'
-set -eo pipefail
-TMP="$HOME/.deploy_tmp"
-
-# Ensure live docroot exists
-sudo mkdir -p /usr/share/nginx/html
-
-# Promote staged files into live docroot (clean, idempotent)
-sudo rsync -a --delete "$TMP"/ /usr/share/nginx/html/
-
-# Minimal error pages (silence logs if your repo doesn't include them)
-sudo bash -lc '[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'
-sudo bash -lc '[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'
-
-# Ownership/SELinux (SELinux restorecon is harmless if not present)
-sudo chown -R nginx:nginx /usr/share/nginx/html
-sudo restorecon -R /usr/share/nginx/html 2>/dev/null || true
-
-# Reload nginx (not strictly necessary for static, but safe)
-sudo systemctl reload nginx || true
-
-echo "✅ Live dir listing:"
-sudo ls -la /usr/share/nginx/html | head -n 40
-REMOTE_EOF
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eo pipefail
+            TMP="$HOME/.deploy_tmp"
+            sudo mkdir -p /usr/share/nginx/html
+            sudo rsync -a --delete "$TMP"/ /usr/share/nginx/html/
+            sudo bash -lc '[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'
+            sudo bash -lc '[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'
+            sudo chown -R nginx:nginx /usr/share/nginx/html
+            sudo restorecon -R /usr/share/nginx/html 2>/dev/null || true
+            sudo systemctl reload nginx || true
+            echo "Live dir:"
+            sudo ls -la /usr/share/nginx/html | head -n 40
 
       - name: Deploy app.py → /opt/marquetteranch/app.py (sudo) and restart Gunicorn (optional)
-        run: |
-          # Upload app.py to home, then move with sudo to /opt
-          scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes ./app.py \
-            "$REMOTE_USER@$REMOTE_HOST:~/app.py"
-          ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" 'bash -s' <<'REMOTE_EOF'
-set -eo pipefail
-sudo mkdir -p /opt/marquetteranch
-sudo mv "$HOME/app.py" /opt/marquetteranch/app.py
-sudo chown root:root /opt/marquetteranch/app.py
-sudo chmod 755 /opt/marquetteranch/app.py
-
-
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eo pipefail
+            sudo mkdir -p /opt/marquetteranch
+            mv -f "$HOME/.deploy_tmp/app.py" "$HOME/app.py" 2>/dev/null || true
+            if [ -f "$HOME/app.py" ]; then
+              sudo mv "$HOME/app.py" /opt/marquetteranch/app.py
+              sudo chown root:root /opt/marquetteranch/app.py
+              sudo chmod 755 /opt/marquetteranch/app.py
+            fi
+            if [ -n "${GUNICORN_SERVICE}" ]; then
+              sudo systemctl restart "${GUNICORN_SERVICE}" || true
+              sudo systemctl status "${GUNICORN_SERVICE}" --no-pager -l || true
+            fi
