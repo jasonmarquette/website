@@ -1,14 +1,16 @@
 name: Deploy Static HTML Site and app.py (rsync + sudo)
 
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["Lint Code Base"]
-    types: [completed]
+  workflow_dispatch:        # manual trigger in GitHub UI
+  # push:
+  #   branches: [ main ]    # ← uncomment to deploy on pushes to main
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -27,10 +29,9 @@ jobs:
         run: |
           ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" "echo SSH OK on $(hostname)"
 
-      - name: Stage website to remote tmp dir (rsync)
+      - name: Rsync repo → remote staging
         run: |
           RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=yes"
-          # Sync repo → remote tmp dir (user-writable)
           rsync -az --delete \
             --exclude ".git" \
             --exclude ".github" \
@@ -38,48 +39,45 @@ jobs:
             --exclude "README.md" \
             --exclude "nginx.conf" \
             --exclude "site.tar.gz" \
-            --exclude "app.py" \
+            --exclude "deploy.sh" \
             -e "$RSYNC_SSH" ./ "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/.deploy_tmp/"
 
-      - name: Promote to /usr/share/nginx/html (sudo) + set perms
+      - name: Promote staging → /usr/share/nginx/html (sudo) + reload nginx
         run: |
           ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" bash -lc '
-            set -e
+            set -euo pipefail
             sudo mkdir -p /usr/share/nginx/html
-            # Promote staged files into live docroot (atomic-ish + cleans removed files)
             sudo rsync -a --delete /home/$REMOTE_USER/.deploy_tmp/ /usr/share/nginx/html/
-            # Basic error pages to avoid noisy logs (if your repo doesn’t include them)
-            sudo bash -c '\''[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'\''
-            sudo bash -c '\''[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'\''
+            # Minimal error pages if missing (quiet logs)
+            sudo bash -lc '\''[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'\''
+            sudo bash -lc '\''[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'\''
             sudo chown -R nginx:nginx /usr/share/nginx/html
             sudo restorecon -R /usr/share/nginx/html 2>/dev/null || true
-            # Reload nginx to pick up any changed assets (usually not required for static, but harmless)
             sudo systemctl reload nginx || true
-            echo "Deployed to /usr/share/nginx/html:"
-            sudo ls -la /usr/share/nginx/html | head -n 30
+            echo "✅ Live dir:"
+            sudo ls -la /usr/share/nginx/html | head -n 40
           '
 
-      - name: Deploy app.py → /opt/marquetteranch/app.py (sudo) and restart service (optional)
+      - name: Deploy app.py → /opt/marquetteranch/app.py (sudo) and restart Gunicorn (optional)
         run: |
           scp -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes ./app.py \
             "$REMOTE_USER@$REMOTE_HOST:/home/$REMOTE_USER/app.py"
           ssh -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=yes "$REMOTE_USER@$REMOTE_HOST" bash -lc '
-            set -e
+            set -euo pipefail
             sudo mkdir -p /opt/marquetteranch
             sudo mv /home/$REMOTE_USER/app.py /opt/marquetteranch/app.py
             sudo chown root:root /opt/marquetteranch/app.py
             sudo chmod 755 /opt/marquetteranch/app.py
-            # If you have a Gunicorn service, restart it (set GUNICORN_SERVICE secret to your unit name)
-            if [ -n "$GUNICORN_SERVICE" ]; then
+            if [ -n "${GUNICORN_SERVICE:-}" ]; then
               sudo systemctl restart "$GUNICORN_SERVICE" || true
               sudo systemctl status "$GUNICORN_SERVICE" --no-pager -l || true
             fi
           '
-        env:
-          GUNICORN_SERVICE: ${{ secrets.GUNICORN_SERVICE }}
 
     env:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
       REMOTE_USER: ${{ secrets.REMOTE_USER }}
       REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+      # no trailing slash; this job promotes to /usr/share/nginx/html directly
+      GUNICORN_SERVICE: ${{ secrets.GUNICORN_SERVICE }}   # e.g., marquette-chat.service (or leave blank)
