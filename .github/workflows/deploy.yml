@@ -57,23 +57,3 @@ jobs:
             sudo systemctl reload nginx || true
             echo "Live dir:"
             sudo ls -la /usr/share/nginx/html | head -n 40
-
-      - name: Deploy app.py → /opt/marquetteranch/app.py (sudo) and restart Gunicorn (optional)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -eo pipefail
-            sudo mkdir -p /opt/marquetteranch
-            mv -f "$HOME/.deploy_tmp/app.py" "$HOME/app.py" 2>/dev/null || true
-            if [ -f "$HOME/app.py" ]; then
-              sudo mv "$HOME/app.py" /opt/marquetteranch/app.py
-              sudo chown root:root /opt/marquetteranch/app.py
-              sudo chmod 755 /opt/marquetteranch/app.py
-            fi
-            if [ -n "${GUNICORN_SERVICE}" ]; then
-              sudo systemctl restart "${GUNICORN_SERVICE}" || true
-              sudo systemctl status "${GUNICORN_SERVICE}" --no-pager -l || true
-            fi
