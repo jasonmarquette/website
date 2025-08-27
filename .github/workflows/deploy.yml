@@ -69,12 +69,12 @@ jobs:
             sudo ls -la /usr/share/nginx/html | head -n 40
 
       # Optional: restart gunicorn if you deploy a backend there too
-      - name: Restart Gunicorn (optional)
-        if: env.GUNICORN_SERVICE != ''
+      - name: Restart Gunicorn
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo systemctl restart "${GUNICORN_SERVICE}"
+            sudo systemctl restart ${{ secrets.GUNICORN_SERVICE }}
+
