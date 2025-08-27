@@ -1,9 +1,14 @@
 name: Deploy Static HTML Site and app.py
 
 on:
-  workflow_dispatch:
-  # push:
-  #   branches: [ main ]
+  push:
+    branches: [ main ]          # ← runs when you push to main
+    # paths:                     # (optional) uncomment to limit when it runs
+    #   - "**/*.html"
+    #   - "**/*.css"
+    #   - "**/*.js"
+    #   - "app.py"
+  workflow_dispatch:             # ← still allow manual runs
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -22,13 +27,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Rsync repo to remote staging (~/.deploy_tmp)
+      - name: Prepare SSH + rsync repo to remote staging (~/.deploy_tmp)
         run: |
+          set -euo pipefail
           mkdir -p "$HOME/.ssh"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
-          echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
+          printf '%s\n' "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 644 "$HOME/.ssh/known_hosts"
+
           RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=yes"
           rsync -az --delete \
             --exclude ".git" \
@@ -50,10 +57,24 @@ jobs:
             TMP="$HOME/.deploy_tmp"
             sudo mkdir -p /usr/share/nginx/html
             sudo rsync -a --delete "$TMP"/ /usr/share/nginx/html/
+            # Ensure fallback error pages exist
             sudo bash -lc '[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'
             sudo bash -lc '[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'
+            # Ownership/SELinux (SELinux restorecon is a no-op if not present)
             sudo chown -R nginx:nginx /usr/share/nginx/html
             sudo restorecon -R /usr/share/nginx/html 2>/dev/null || true
+            # Reload nginx
             sudo systemctl reload nginx || true
-            echo "Live dir:"
+            echo "Live dir (top 40):"
             sudo ls -la /usr/share/nginx/html | head -n 40
+
+      # Optional: restart gunicorn if you deploy a backend there too
+      - name: Restart Gunicorn (optional)
+        if: env.GUNICORN_SERVICE != ''
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart "${GUNICORN_SERVICE}"
