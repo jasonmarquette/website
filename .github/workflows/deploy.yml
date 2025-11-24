@@ -24,8 +24,10 @@ jobs:
 
       - name: Debug key shape
         run: |
+          ls -al $HOME/.ssh
           wc -l $HOME/.ssh/id_rsa
           head -n 5 $HOME/.ssh/id_rsa
+
 
 
       - name: Prepare SSH + rsync repo to remote staging (~/.deploy_tmp)
