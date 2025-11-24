@@ -22,6 +22,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug key shape
+        run: |
+          wc -l $HOME/.ssh/id_rsa
+          head -n 5 $HOME/.ssh/id_rsa
+
+
       - name: Prepare SSH + rsync repo to remote staging (~/.deploy_tmp)
         run: |
           set -euo pipefail
