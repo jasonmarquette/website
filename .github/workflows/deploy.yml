@@ -1,14 +1,9 @@
-name: Deploy Static HTML Site and app.py
+name: Deploy Static Website + app.py
 
 on:
   push:
-    branches: [ main ]          # ← runs when you push to main
-    # paths:                     # (optional) uncomment to limit when it runs
-    #   - "**/*.html"
-    #   - "**/*.css"
-    #   - "**/*.js"
-    #   - "app.py"
-  workflow_dispatch:             # ← still allow manual runs
+    branches: [ main ]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -46,7 +41,7 @@ jobs:
             --exclude "deploy.sh" \
             -e "$RSYNC_SSH" ./ "$REMOTE_USER@$REMOTE_HOST:~/.deploy_tmp/"
 
-      - name: Promote staging → /usr/share/nginx/html (sudo) + reload nginx
+      - name: Promote staging → /var/www/marquetteranch + reload nginx
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -55,20 +50,20 @@ jobs:
           script: |
             set -eo pipefail
             TMP="$HOME/.deploy_tmp"
-            sudo mkdir -p /usr/share/nginx/html
-            sudo rsync -a --delete "$TMP"/ /usr/share/nginx/html/
-            # Ensure fallback error pages exist
-            sudo bash -lc '[ -f /usr/share/nginx/html/404.html ] || echo "<h1>Not Found</h1>" > /usr/share/nginx/html/404.html'
-            sudo bash -lc '[ -f /usr/share/nginx/html/50x.html ] || echo "<h1>Error</h1>" > /usr/share/nginx/html/50x.html'
-            # Ownership/SELinux (SELinux restorecon is a no-op if not present)
-            sudo chown -R nginx:nginx /usr/share/nginx/html
-            sudo restorecon -R /usr/share/nginx/html 2>/dev/null || true
-            # Reload nginx
+            sudo mkdir -p /var/www/marquetteranch
+            sudo rsync -a --delete "$TMP"/ /var/www/marquetteranch/
+            
+            # Fix permissions
+            sudo chown -R jason:www-data /var/www/marquetteranch
+            sudo chmod -R 775 /var/www/marquetteranch
+            
+            # Reload nginx to pick up new content
             sudo systemctl reload nginx || true
-            echo "Live dir (top 40):"
-            sudo ls -la /usr/share/nginx/html | head -n 40
+            
+            echo "Live site contents:"
+            sudo ls -la /var/www/marquetteranch | head -n 40
 
-      # Optional: restart gunicorn if you deploy a backend there too
+      # Optional: restart gunicorn if your backend is running
       - name: Restart Gunicorn
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -76,5 +71,4 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo systemctl restart ${{ secrets.GUNICORN_SERVICE }}
-
+            sudo systemctl restart ${{ secrets.GUNICORN_SERVICE }} || true
