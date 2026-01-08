@@ -31,7 +31,6 @@ jobs:
 
       - name: Test SSH connectivity (force IPv4)
         run: |
-          set -e
           ssh -4 \
             -i "$HOME/.ssh/id_rsa" \
             -o StrictHostKeyChecking=no \
@@ -41,7 +40,6 @@ jobs:
       - name: Rsync repo to remote staging (~/.deploy_tmp)
         run: |
           set -euo pipefail
-
           RSYNC_SSH="ssh -4 -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no"
 
           rsync -az --delete \
@@ -55,31 +53,23 @@ jobs:
             ./ "$REMOTE_USER@$REMOTE_HOST:~/.deploy_tmp/"
 
       - name: Promote staging → /var/www/marquetteranch + reload nginx
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          use_ipv6: false
-          script: |
-            set -euo pipefail
+        run: |
+          ssh -4 -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=no \
+            "$REMOTE_USER@$REMOTE_HOST" <<'EOF'
+              set -euo pipefail
+              TMP="$HOME/.deploy_tmp"
 
-            TMP="$HOME/.deploy_tmp"
+              sudo mkdir -p /var/www/marquetteranch
+              sudo rsync -a --delete "$TMP"/ /var/www/marquetteranch/
 
-            sudo mkdir -p /var/www/marquetteranch
-            sudo rsync -a --delete "$TMP"/ /var/www/marquetteranch/
+              sudo chown -R jason:www-data /var/www/marquetteranch
+              sudo chmod -R 775 /var/www/marquetteranch
 
-            sudo chown -R jason:www-data /var/www/marquetteranch
-            sudo chmod -R 775 /var/www/marquetteranch
-
-            sudo systemctl reload nginx
+              sudo systemctl reload nginx
+          EOF
 
       - name: Restart Gunicorn
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          use_ipv6: false
-          script: |
-            sudo systemctl restart ${{ secrets.GUNICORN_SERVICE }}
+        run: |
+          ssh -4 -i "$HOME/.ssh/id_rsa" -o StrictHostKeyChecking=no \
+            "$REMOTE_USER@$REMOTE_HOST" \
+            "sudo systemctl restart $GUNICORN_SERVICE"
