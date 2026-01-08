@@ -29,15 +29,10 @@ jobs:
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
 
-          echo "SSH key sanity check:"
-          wc -l "$HOME/.ssh/id_rsa"
-          head -n 5 "$HOME/.ssh/id_rsa"
-
-      # 🔍 NEW: Explicit SSH connectivity test
-      - name: Test SSH connectivity (fail fast)
+      - name: Test SSH connectivity (force IPv4)
         run: |
           set -e
-          ssh -vvv \
+          ssh -4 \
             -i "$HOME/.ssh/id_rsa" \
             -o StrictHostKeyChecking=no \
             -o ConnectTimeout=10 \
@@ -47,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no"
+          RSYNC_SSH="ssh -4 -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no"
 
           rsync -az --delete \
             --exclude ".git" \
@@ -56,7 +51,8 @@ jobs:
             --exclude "README.md" \
             --exclude "site.tar.gz" \
             --exclude "deploy.sh" \
-            -e "$RSYNC_SSH" ./ "$REMOTE_USER@$REMOTE_HOST:~/.deploy_tmp/"
+            -e "$RSYNC_SSH" \
+            ./ "$REMOTE_USER@$REMOTE_HOST:~/.deploy_tmp/"
 
       - name: Promote staging → /var/www/marquetteranch + reload nginx
         uses: appleboy/ssh-action@v1.0.3
@@ -64,19 +60,19 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          use_ipv6: false
           script: |
-            set -eo pipefail
+            set -euo pipefail
+
             TMP="$HOME/.deploy_tmp"
+
             sudo mkdir -p /var/www/marquetteranch
             sudo rsync -a --delete "$TMP"/ /var/www/marquetteranch/
 
             sudo chown -R jason:www-data /var/www/marquetteranch
             sudo chmod -R 775 /var/www/marquetteranch
 
-            sudo systemctl reload nginx || true
-
-            echo "Live site contents:"
-            sudo ls -la /var/www/marquetteranch | head -n 40
+            sudo systemctl reload nginx
 
       - name: Restart Gunicorn
         uses: appleboy/ssh-action@v1.0.3
@@ -84,5 +80,6 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          use_ipv6: false
           script: |
-            sudo systemctl restart ${{ secrets.GUNICORN_SERVICE }} || true
+            sudo systemctl restart ${{ secrets.GUNICORN_SERVICE }}
