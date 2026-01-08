@@ -9,7 +9,11 @@ def init_bedrock_agent_runtime_client():
     return boto3.client(
         "bedrock-agent-runtime",
         region_name="us-east-1",
-        config=Config(read_timeout=300),
+        config=Config(
+        read_timeout=60,
+        connect_timeout=10,
+        retries={"max_attempts": 2},
+        ),
     )
 
 
