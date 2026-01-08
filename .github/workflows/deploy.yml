@@ -22,20 +22,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare SSH + rsync repo to remote staging (~/.deploy_tmp)
+      - name: Prepare SSH key
         run: |
           set -euo pipefail
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
 
-          # no strict host checking in CI
-          RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no"
-
-          # Debug key AFTER creation
-          echo "Key lines:"
+          echo "SSH key sanity check:"
           wc -l "$HOME/.ssh/id_rsa"
           head -n 5 "$HOME/.ssh/id_rsa"
+
+      # 🔍 NEW: Explicit SSH connectivity test
+      - name: Test SSH connectivity (fail fast)
+        run: |
+          set -e
+          ssh -vvv \
+            -i "$HOME/.ssh/id_rsa" \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=10 \
+            "$REMOTE_USER@$REMOTE_HOST" exit
+
+      - name: Rsync repo to remote staging (~/.deploy_tmp)
+        run: |
+          set -euo pipefail
+
+          RSYNC_SSH="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no"
 
           rsync -az --delete \
             --exclude ".git" \
@@ -57,12 +69,12 @@ jobs:
             TMP="$HOME/.deploy_tmp"
             sudo mkdir -p /var/www/marquetteranch
             sudo rsync -a --delete "$TMP"/ /var/www/marquetteranch/
-            
+
             sudo chown -R jason:www-data /var/www/marquetteranch
             sudo chmod -R 775 /var/www/marquetteranch
-            
+
             sudo systemctl reload nginx || true
-            
+
             echo "Live site contents:"
             sudo ls -la /var/www/marquetteranch | head -n 40
 
