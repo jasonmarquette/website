@@ -281,7 +281,7 @@
       <div class="collapse navbar-collapse" id="navbar-nav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+          
           <li class="nav-item"><a class="nav-link" href="#resume">Resume</a></li>
           
         </ul>
@@ -317,38 +317,7 @@
     </div>
   </section>
 
-  <!-- Portfolio Section -->
-  <section id="portfolio" class="py-5">
-    <div class="container">
-      <h2>Portfolio</h2>
-      <div class="row align-items-center justify-content-center">
-        <div class="col-md-4 text-center">
-          <img src="image.png" width="100" class="img-fluid shadow rounded me-3" alt="AWS Solutions Architecture">
-          <img src="image1.png" width="100" class="img-fluid shadow rounded" alt="AWS AI Practitioner">
-        </div>
-        <div class="col-md-8">
-          <p>
-            My portfolio showcases a website that I built to demonstrate my skills in cloud solutions architecture and web development. It includes:
-          </p>
-          <li>
-            Creating a chatbot using Amazon Bedrock, the chatbot is a simple text bot that can 
-            answer questions about myself. It is built using AWS Bedrock, Flask, JavaScript, 
-            and it uses a simple knowledge base via AWS Bedrock to provide answers. If it cannot find an answer in the knowledge base, it will default to a foundation model.
-          </li>
-          <li>
-            Utilizing Amazon AWS Bedrock, S3, Route 53, and EC2 to host the chatbot and website.
-          </li>
-          <li>
-            A responsive design that works well on both desktop and mobile devices.
-          </li>
-          <li>
-            This website is built using HTML, CSS, and JavaScript, with Bootstrap for styling and layout. The Three.js background adds a modern touch, while the chatbot provides an interactive element for visitors.
-          </li>
-            
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <!-- Resume Section -->
   <section id="resume" class="py-5 bg-light">
@@ -480,18 +449,7 @@
     </div>
   </section>
 
-  <!-- Floating Chat Button -->
-  <button class="chat-button" onclick="toggleChat()" aria-label="Open Chat"><i class="bi bi-chat-dots"></i></button>
-
-  <!-- Chatbox -->
-  <div class="chatbox" id="chatbox">
-    <div class="drag-handle" id="drag-handle">Chat Bot</div>
-    <div id="response" class="response-box">I'm a textbot, ask me a question about Jason's experience..</div>
-    <textarea id="prompt" placeholder="Type your message..."></textarea>
-    <button class="btn btn-primary send-btn" onclick="sendPrompt()">Send</button>
-    <div class="resize-handle"></div>
-  </div>
-
+ 
   <!-- Footer -->
   <footer class="py-4 text-center">
     <div class="container">

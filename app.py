@@ -1,18 +1,34 @@
 import json
+import logging
+import threading
 
 import boto3
 from botocore.config import Config
+from botocore.exceptions import ClientError
 from flask import Flask, jsonify, request
 
 
+# -------------------------------------------------
+# Logging
+# -------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+
+# -------------------------------------------------
+# Bedrock Clients (NO RETRIES)
+# -------------------------------------------------
 def init_bedrock_agent_runtime_client():
     return boto3.client(
         "bedrock-agent-runtime",
         region_name="us-east-1",
         config=Config(
-        read_timeout=60,
-        connect_timeout=10,
-        retries={"max_attempts": 2},
+            connect_timeout=5,
+            read_timeout=30,
+            retries={"max_attempts": 0},
         ),
     )
 
@@ -21,93 +37,135 @@ def init_bedrock_runtime_client():
     return boto3.client(
         "bedrock-runtime",
         region_name="us-east-1",
-        config=Config(read_timeout=60),
+        config=Config(
+            connect_timeout=5,
+            read_timeout=30,
+            retries={"max_attempts": 0},
+        ),
     )
 
 
-# Knowledge Base info
-KNOWLEDGE_BASE_ID = "EVOLHELSIJ"
-MODEL_ARN = "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0"
+bedrock_agent_client = init_bedrock_agent_runtime_client()
+bedrock_runtime_client = init_bedrock_runtime_client()
 
-bedrock_client = init_bedrock_agent_runtime_client()
-runtime_client = init_bedrock_runtime_client()
 
+# -------------------------------------------------
+# App config
+# -------------------------------------------------
 app = Flask(__name__)
 
-FALLBACK_KEYWORDS = [
-    "cannot find",
-    "can not find",
-    "no relevant data",
-    "do not contain",
-    "didn't find",
-    "not sufficient information",
-    "do not contain any relevant information",
-    "unable to answer",
-    "cannot answer",
-    "no information available",
-    "do not have enough information",
-    "not able to answer",
-    "sorry, i cannot",
-    "i do not know",
-]
+KNOWLEDGE_BASE_ID = "EVOLHELSIJ"
+
+# REQUIRED for RetrieveAndGenerate
+KB_MODEL_ARN = "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0"
+
+# VALID runtime fallback model
+FALLBACK_MODEL_ID = "amazon.nova-lite-v1:0"
+
+KB_HARD_TIMEOUT = 6  # seconds
 
 
-def is_fallback_response(text):
-    text = text.lower()
-    return any(kw in text for kw in FALLBACK_KEYWORDS)
+# -------------------------------------------------
+# Knowledge Base (thread + hard timeout)
+# -------------------------------------------------
+def _kb_worker(prompt: str, result: dict):
+    try:
+        logger.info("KB: calling retrieve_and_generate")
 
-
-def query_knowledge_base(user_prompt):
-    input_data = {
-        "input": {"text": user_prompt},
-        "retrieveAndGenerateConfiguration": {
-            "type": "KNOWLEDGE_BASE",
-            "knowledgeBaseConfiguration": {
-                "knowledgeBaseId": KNOWLEDGE_BASE_ID,
-                "modelArn": MODEL_ARN,
+        response = bedrock_agent_client.retrieve_and_generate(
+            input={"text": prompt},
+            retrieveAndGenerateConfiguration={
+                "type": "KNOWLEDGE_BASE",
+                "knowledgeBaseConfiguration": {
+                    "knowledgeBaseId": KNOWLEDGE_BASE_ID,
+                    "modelArn": KB_MODEL_ARN,
+                },
             },
-        },
-    }
-    response = bedrock_client.retrieve_and_generate(**input_data)
-    return response.get("output", {}).get("text", "")
+        )
+
+        result["text"] = response.get("output", {}).get("text", "")
+
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ThrottlingException":
+            logger.warning("KB: throttled, skipping")
+        else:
+            logger.exception("KB: client error")
+        result["text"] = ""
+
+    except Exception:
+        logger.exception("KB: unexpected error")
+        result["text"] = ""
 
 
-def query_foundation_model(user_prompt):
-    body = {
-        "inputText": user_prompt,
-        "textGenerationConfig": {
-            "maxTokenCount": 512,
-            "temperature": 0.7,
-            "topP": 0.9,
-        },
-    }
-    response = runtime_client.invoke_model(
-        modelId="amazon.titan-text-express-v1",
-        contentType="application/json",
-        accept="application/json",
-        body=json.dumps(body),
-    )
-    result = json.loads(response["body"].read())
-    return result.get("results", [{}])[0].get("outputText", "")
+def query_knowledge_base(prompt: str) -> str:
+    result = {"text": ""}
+    t = threading.Thread(target=_kb_worker, args=(prompt, result), daemon=True)
+    t.start()
+    t.join(timeout=KB_HARD_TIMEOUT)
+
+    if t.is_alive():
+        logger.error("KB: hard timeout reached")
+        return ""
+
+    return result["text"]
 
 
+# -------------------------------------------------
+# Foundation Model fallback (VALID MODEL)
+# -------------------------------------------------
+def query_foundation_model(prompt: str) -> str:
+    try:
+        logger.info("FM: invoking fallback model")
+
+        response = bedrock_runtime_client.invoke_model(
+            modelId=FALLBACK_MODEL_ID,
+            contentType="application/json",
+            accept="application/json",
+            body=json.dumps(
+                {
+                    "inputText": prompt,
+                    "textGenerationConfig": {
+                        "maxTokenCount": 512,
+                        "temperature": 0.7,
+                        "topP": 0.9,
+                    },
+                }
+            ),
+        )
+
+        payload = json.loads(response["body"].read())
+        return payload.get("results", [{}])[0].get("outputText", "")
+
+    except Exception:
+        logger.exception("FM: failed")
+        return "Sorry — the assistant is temporarily unavailable."
+
+
+# -------------------------------------------------
+# Route
+# -------------------------------------------------
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json() or {}
-    user_prompt = data.get("prompt", "")
-    if not user_prompt:
+    data = request.get_json(silent=True) or {}
+    prompt = data.get("prompt", "").strip()
+
+    if not prompt:
         return jsonify({"error": "Missing prompt"}), 400
 
-    try:
-        kb_response = query_knowledge_base(user_prompt)
-        if not kb_response or is_fallback_response(kb_response):
-            fm_response = query_foundation_model(user_prompt)
-            return jsonify({"response": fm_response, "source": "foundation_model"})
-        else:
-            return jsonify({"response": kb_response, "source": "knowledge_base"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    logger.info("CHAT: request received")
+
+    kb_text = query_knowledge_base(prompt)
+
+    if not kb_text:
+        logger.info("CHAT: using fallback model")
+        fm_text = query_foundation_model(prompt)
+        return jsonify({"response": fm_text, "source": "foundation_model"})
+
+    return jsonify({"response": kb_text, "source": "knowledge_base"})
 
 
+# -------------------------------------------------
+# Local dev only
+# -------------------------------------------------
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(host="127.0.0.1", port=5000, debug=True)
