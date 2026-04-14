@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jason Marquette | A&P In Progress</title>
+  <meta name="description" content="Jason Marquette — A&P in progress. Aviation maintenance journey landing page." />
+  <style>
+    :root{
+      --bg:#09111d;
+      --bg2:#101a2b;
+      --panel:rgba(255,255,255,0.08);
+      --text:#f4f7fb;
+      --muted:#b7c4d6;
+      --accent:#4db5ff;
+      --accent2:#ffd24d;
+      --border:rgba(255,255,255,0.12);
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(77,181,255,.18), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255,210,77,.12), transparent 30%),
+        linear-gradient(135deg, var(--bg), var(--bg2));
+      min-height:100vh;
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:32px 20px 56px;
+    }
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:32px;
+    }
+    .brand{
+      font-size:1rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#dfe8f5;
+    }
+    .nav a{
+      color:var(--text);
+      text-decoration:none;
+      border:1px solid var(--border);
+      padding:10px 16px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      backdrop-filter: blur(8px);
+    }
+    .hero{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:36px;
+      align-items:center;
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .copy{
+      padding:44px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(77,181,255,.12);
+      border:1px solid rgba(77,181,255,.25);
+      color:#cfe9ff;
+      font-size:.92rem;
+      margin-bottom:22px;
+    }
+    h1{
+      margin:0 0 18px;
+      font-size:clamp(2.4rem, 5vw, 5rem);
+      line-height:.95;
+      letter-spacing:-.03em;
+    }
+    h1 .accent{color:var(--accent2)}
+    p.lead{
+      margin:0 0 28px;
+      color:var(--muted);
+      font-size:1.1rem;
+      line-height:1.65;
+      max-width:58ch;
+    }
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:28px;
+    }
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      font-weight:700;
+      padding:14px 20px;
+      border-radius:14px;
+      transition:transform .18s ease, opacity .18s ease;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{
+      background:linear-gradient(135deg, var(--accent), #7cc8ff);
+      color:#07111d;
+    }
+    .btn-secondary{
+      border:1px solid var(--border);
+      color:var(--text);
+      background:rgba(255,255,255,.05);
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+    }
+    .stat{
+      padding:18px;
+      border-radius:18px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      margin-bottom:6px;
+    }
+    .stat span{
+      color:var(--muted);
+      font-size:.95rem;
+      line-height:1.4;
+    }
+    .photo{
+      padding:14px;
+      overflow:hidden;
+      position:relative;
+    }
+    .photo::after{
+      content:"";
+      position:absolute;
+      inset:auto 18px 18px auto;
+      width:130px;
+      height:130px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,210,77,.55), rgba(255,210,77,0));
+      filter:blur(12px);
+      pointer-events:none;
+    }
+    .photo img{
+      width:100%;
+      height:100%;
+      max-height:780px;
+      object-fit:cover;
+      border-radius:22px;
+      display:block;
+    }
+    .footer{
+      margin-top:28px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.95rem;
+    }
+    .tagline{
+      margin-top:12px;
+      font-size:.98rem;
+      color:#d7e2ef;
+    }
+    @media (max-width: 920px){
+      .hero{grid-template-columns:1fr}
+      .copy{padding:30px}
+      .stats{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">Jason Marquette</div>
+      <a href="https://www.marquetteranch.com/">Back to main site</a>
+    </div>
+
+    <section class="hero">
+      <div class="panel copy">
+        <div class="eyebrow">✈️ Aviation maintenance journey underway</div>
+        <h1>A&amp;P <span class="accent">in progress...</span></h1>
+        <p class="lead">
+          I’m building the next chapter of my career in aviation maintenance. This page is a holding
+          pattern for what’s coming next — training, hands-on experience, and the path toward becoming
+          a certified Airframe &amp; Powerplant mechanic.
+        </p>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="mailto:jasonmarquette@icloud.com">Contact Jason</a>
+          <a class="btn btn-secondary" href="https://www.marquetteranch.com/">View current website</a>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <strong>Private Pilot</strong>
+            <span>Aviation is not just an interest — it is already part of the journey.</span>
+          </div>
+          <div class="stat">
+            <strong>Hands-on mindset</strong>
+            <span>Bringing technical problem-solving and operations experience into maintenance.</span>
+          </div>
+          <div class="stat">
+            <strong>More coming soon</strong>
+            <span>Resume updates, progress milestones, and aviation-focused projects.</span>
+          </div>
+        </div>
+
+        <div class="tagline">From cloud systems to aircraft systems.</div>
+      </div>
+
+      <div class="panel photo">
+        <img src="jason-ap-progress.png" alt="Jason Marquette in a hangar with an aircraft in the background" />
+      </div>
+    </section>
+
+    <div class="footer">
+      Temporary landing page concept for marquetteranch.com
+    </div>
+  </div>
+</body>
+</html>
