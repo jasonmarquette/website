@@ -2,605 +2,236 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jason Marquette</title>
-  <!-- Bootstrap CSS & Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jason Marquette | A&P In Progress</title>
+  <meta name="description" content="Jason Marquette — A&P in progress. Aviation maintenance journey landing page." />
   <style>
-    html, body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      background: #f7fafd;
-      color: #151719;
-      font-size: .97rem;
-      scroll-behavior: smooth;
+    :root{
+      --bg:#09111d;
+      --bg2:#101a2b;
+      --panel:rgba(255,255,255,0.08);
+      --text:#f4f7fb;
+      --muted:#b7c4d6;
+      --accent:#4db5ff;
+      --accent2:#ffd24d;
+      --border:rgba(255,255,255,0.12);
+      --shadow:0 20px 60px rgba(0,0,0,.35);
     }
-    .navbar {
-      background: #fff !important;
-      box-shadow: 0 2px 16px 0 rgba(0,0,0,0.03);
-      border-bottom: 1px solid #e6ecf3;
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(77,181,255,.18), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255,210,77,.12), transparent 30%),
+        linear-gradient(135deg, var(--bg), var(--bg2));
+      min-height:100vh;
     }
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.35rem;
-      color: #0071e3 !important;
-      letter-spacing: 0.02em;
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:32px 20px 56px;
     }
-    .nav-link {
-      color: #222 !important;
-      font-weight: 500;
-      margin-right: 12px;
-      transition: color 0.16s;
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:32px;
     }
-    .nav-link.active, .nav-link:focus, .nav-link:hover {
-      color: #0071e3 !important;
-      text-decoration: underline;
-      outline: none;
+    .brand{
+      font-size:1rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#dfe8f5;
     }
-    /* HERO + THREE.JS BACKGROUND */
-    #hero {
-      min-height: 92vh;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 70px;
-      background: none;
-      overflow: hidden;
+    .nav a{
+      color:var(--text);
+      text-decoration:none;
+      border:1px solid var(--border);
+      padding:10px 16px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      backdrop-filter: blur(8px);
     }
-    #three-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      width: 100vw;
-      height: 100%;
-      pointer-events: none;
+    .hero{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:36px;
+      align-items:center;
     }
-    #hero .content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 2.6rem 1.3rem;
-      animation: fadeIn 0.8s;
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(12px);
     }
-    @keyframes fadeIn { from{ opacity:0; transform:translateY(16px);} to{ opacity:1; transform:none;}}
-    #hero .display-4 {
-      font-weight: 700; font-size: 2.7rem; color: #111; margin-bottom: .7rem; letter-spacing: 0.01em;
+    .copy{
+      padding:44px;
     }
-    #hero .hero-desc {
-      color: #375069; font-size: 1.15rem; margin-bottom: 1.3rem; font-weight: 500;
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(77,181,255,.12);
+      border:1px solid rgba(77,181,255,.25);
+      color:#cfe9ff;
+      font-size:.92rem;
+      margin-bottom:22px;
     }
-    #hero .btn-primary {
-      background: #0071e3;
-      color: #fff;
-      border-radius: 22px;
-      padding: 0.72rem 2.1rem;
-      font-size: 1.14rem;
-      font-weight: 600;
-      box-shadow: 0 3px 16px rgba(0,0,0,0.06);
-      border: none;
-      transition: background 0.14s, box-shadow 0.13s;
+    h1{
+      margin:0 0 18px;
+      font-size:clamp(2.4rem, 5vw, 5rem);
+      line-height:.95;
+      letter-spacing:-.03em;
     }
-    #hero .btn-primary:hover { background: #003c7c; }
-    section h2, .card-title {
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: #12212c;
-      font-size: 2.1rem;
-      text-align: center;
-      margin-bottom: 1.7rem;
+    h1 .accent{color:var(--accent2)}
+    p.lead{
+      margin:0 0 28px;
+      color:var(--muted);
+      font-size:1.1rem;
+      line-height:1.65;
+      max-width:58ch;
     }
-    #about img {
-      width: 220px; height: 320px; object-fit: cover;
-      border-radius: 16px;
-      border: 2px solid #e4e7ed;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      margin-bottom: 1.1rem; background: #fff;
-      transition: box-shadow .16s;
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:28px;
     }
-    #about img:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.13);}
-    #about p { font-size: 1.14rem; color: #323a42;}
-    .card {
-      border-radius: 20px; border: 1px solid #e4e7ed; background: #fff;
-      box-shadow: 0 2px 18px 0 rgba(0,0,0,0.04); margin-bottom: 2.2rem;
-      transition: box-shadow 0.13s;
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      font-weight:700;
+      padding:14px 20px;
+      border-radius:14px;
+      transition:transform .18s ease, opacity .18s ease;
     }
-    #about {
-      scroll-margin-top: 40px;
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{
+      background:linear-gradient(135deg, var(--accent), #7cc8ff);
+      color:#07111d;
     }
-    #portfolio {
-      scroll-margin-top: 40px;
+    .btn-secondary{
+      border:1px solid var(--border);
+      color:var(--text);
+      background:rgba(255,255,255,.05);
     }
-    #resume {
-      scroll-margin-top: 40px;
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
     }
-    .card-body { padding: 1.6rem; }
-    
-    .card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.11);}
-    .skills-list ul { list-style: none; padding: 0; text-align: center;}
-    .skills-list li {
-      display: inline-block; background: #eaf3fa; color: #333;
-      border-radius: 15px; padding: 8px 18px; margin: 0 7px 9px 0;
-      font-size: 1.01rem; font-weight: 500; border: 1px solid #e4e7ed;
+    .stat{
+      padding:18px;
+      border-radius:18px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
     }
-    section { margin-top: 3.3rem; margin-bottom: 3.3rem;}
-    /* Chatbot & Footer */
-    .chat-button {
-      position: fixed;
-      bottom: 22px;
-      right: 22px;
-      background: #111;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
-      font-size: 1.8rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.09);
-      z-index: 1000;
-      transition: transform 0.13s;
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      margin-bottom:6px;
     }
-    .chat-button:hover { transform: scale(1.06); background: #0071e3; }
-    .chatbox {
-      position: fixed;
-      bottom: 86px;
-      right: 22px;
-      width: 360px;
-      height: 520px;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 6px 28px rgba(0,0,0,0.11);
-      display: none;
-      flex-direction: column;
-      padding: 0;
-      z-index: 1000;
-      min-width: 260px;
-      min-height: 200px;
-      max-width: 95vw;
-      max-height: 92vh;
-      overflow: hidden;
-      animation: fadeInDown 0.25s cubic-bezier(.43,.01,.38,1.01);
+    .stat span{
+      color:var(--muted);
+      font-size:.95rem;
+      line-height:1.4;
     }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-18px);}
-      to   { opacity: 1; transform: none;}
+    .photo{
+      padding:14px;
+      overflow:hidden;
+      position:relative;
     }
-    .drag-handle {
-      width: 100%;
-      height: 44px;
-      background: #f7faff;
-      cursor: move;
-      border-radius: 18px 18px 0 0;
-      font-weight: 700;
-      color: #111;
-      display: flex;
-      align-items: center;
-      padding-left: 18px;
-      user-select: none;
-      border-bottom: 1px solid #e4e7ed;
-      font-size: 1.1rem;
-      letter-spacing: 0.2px;
+    .photo::after{
+      content:"";
+      position:absolute;
+      inset:auto 18px 18px auto;
+      width:130px;
+      height:130px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,210,77,.55), rgba(255,210,77,0));
+      filter:blur(12px);
+      pointer-events:none;
     }
-    .chatbox .response-box {
-      flex: 1;
-      background: #f5f7fa;
-      border-radius: 4px;
-      padding: 14px;
-      margin: 15px 14px 8px 14px;
-      overflow-y: auto;
-      min-height: 120px;
-      max-height: 340px;
-      font-size: 1.04rem;
-      color: #222;
+    .photo img{
+      width:100%;
+      height:100%;
+      max-height:780px;
+      object-fit:cover;
+      border-radius:22px;
+      display:block;
     }
-    .chatbox textarea {
-      width: 92%;
-      resize: none;
-      margin: 0 12px 12px 12px;
-      min-height: 50px;
-      border-radius: 12px;
-      border: 1px solid #e0e3e9;
-      padding: 10px;
-      font-family: inherit;
-      font-size: 1.04rem;
+    .footer{
+      margin-top:28px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.95rem;
     }
-    .chatbox .send-btn {
-      width: 92%;
-      margin: 0 12px 16px 12px;
-      border-radius: 22px;
-      font-weight: 500;
-      background: #111;
-      border: none;
-      transition: background .14s;
-      font-size: 1.09rem;
+    .tagline{
+      margin-top:12px;
+      font-size:.98rem;
+      color:#d7e2ef;
     }
-    .chatbox .send-btn:hover {
-      background: #0071e3;
-      color: #fff;
+    @media (max-width: 920px){
+      .hero{grid-template-columns:1fr}
+      .copy{padding:30px}
+      .stats{grid-template-columns:1fr}
     }
-    .resize-handle {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      right: 0;
-      bottom: 0;
-      cursor: se-resize;
-      z-index: 1100;
-      background: transparent;
-    }
-    .resize-handle:after {
-      content: "";
-      display: block;
-      width: 15px;
-      height: 15px;
-      border-right: 2.5px solid #bbb;
-      border-bottom: 2.5px solid #bbb;
-      position: absolute;
-      right: 2px;
-      bottom: 2px;
-      border-radius: 0 0 6px 0;
-    }
-    @media (max-width: 600px) {
-      .chatbox {
-        left: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important;
-        width: 100vw !important; height: 100vh !important;
-        min-width: 100vw !important; min-height: 100vh !important;
-        max-width: 100vw !important; max-height: 100vh !important;
-        border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; z-index: 9999 !important;
-      }
-      .resize-handle, .drag-handle { display: none !important; }
-    }
-    footer {
-      background: linear-gradient(90deg,#e8eef6,#fafbfc 70%);
-      color: #506172;
-      font-size: 1.08rem;
-      margin-top: 3.3rem;
-      border-top: 1px solid #e3eaf3;
-      box-shadow: 0 -1px 7px 0 rgba(0,0,0,0.02);
-      letter-spacing: 0.01em;
-    }
-    footer a { color: #0071e3; opacity: .8; font-size: 1.19rem; margin: 0 6px;}
-    footer a:hover { opacity: 1; color: #222;}
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light fixed-top" aria-label="Primary Navigation">
-    <div class="container">
-      <a class="navbar-brand" href="#">Jason Marquette</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-nav"
-        aria-controls="navbar-nav" aria-expanded="false" aria-label="Toggle navigation" >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbar-nav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-          
-          <li class="nav-item"><a class="nav-link" href="#resume">Resume</a></li>
-          
-        </ul>
-      </div>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">Jason Marquette</div>
+      <a href="https://www.marquetteranch.com/">Back to main site</a>
     </div>
-  </nav>
 
-  <!-- Hero Section with Three.js Canvas -->
-  <section id="hero">
-    <div id="three-bg"></div>
-    <div class="content">
-      <h1 class="display-4 mb-3">Jason Marquette</h1>
-      <div class="hero-desc">Director of Operations | Cloud Solutions Architect | Strategic Cloud Migration &amp; Optimization | AWS Certified</div>
-      <a href="#resume" class="btn btn-primary shadow">View My Resume</a>
-      <a href="JMarquette_Resume.pdf" class="btn btn-outline-primary shadow ms-2" download>Download PDF</a>
-    </div>
-  </section>
-
-  <!-- About Section -->
-  <section id="about" class="py-5">
-    <div class="container">
-      <h2>About Me</h2>
-      <div class="row align-items-center justify-content-center">
-        <div class="col-md-4 text-center">
-          <img src="jason-headshot.png" class="img-fluid shadow rounded" alt="Professional headshot of Jason Marquette">
-        </div>
-        <div class="col-md-8">
-          <p>
-            I'm a dynamic operations and cloud leader with 20+ years of experience driving enterprise technology transformation, cloud migration, and process optimization. I have a proven ability to align technical strategy with business goals, reduce operational costs, and lead cross-functional teams through large-scale modernization efforts.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-
-  <!-- Resume Section -->
-  <section id="resume" class="py-5 bg-light">
-    <div class="container">
-      <div class="text-center mb-4">
-        <h1 class="fw-bold" style="color:#111;">Jason Marquette</h1>
-        <p>
-          <i class="bi bi-envelope"></i> <a href="mailto:jasonmarquette@icloud.com">jasonmarquette@icloud.com</a> &nbsp; | &nbsp;
-          <i class="bi bi-phone"></i> <a href="tel:+16127092449">(612) 709-2449</a> &nbsp; | &nbsp; <i class="bi bi-geo-alt"></i> The Woodlands, TX
+    <section class="hero">
+      <div class="panel copy">
+        <div class="eyebrow">✈️ Aviation maintenance journey underway</div>
+        <h1>A&amp;P <span class="accent">in progress...</span></h1>
+        <p class="lead">
+          I’m building the next chapter of my career in aviation maintenance. This page is a holding
+          pattern for what’s coming next — training, hands-on experience, and the path toward becoming
+          a certified Airframe &amp; Powerplant mechanic.
         </p>
-        <p>Director of Operations | Cloud Solutions Architect | Strategic Cloud Migration &amp; Optimization | AWS Certified</p>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h2 class="card-title">About</h2>
-          <ul class="list-unstyled mb-0">
-            <li>Dynamic operations and cloud leader with 20+ years of experience driving enterprise technology transformation, cloud migration, and process optimization. Proven ability to align technical strategy with business goals, reduce operational costs, and lead cross-functional teams through large-scale modernization efforts.</li>
-          </ul>
+
+        <div class="actions">
+          <a class="btn btn-secondary" href="https://www.marquetteranch.com/index_old.html">View current website</a>
         </div>
-      </div>
-      <div class="container mt-4 skills-list">
-        <div class="row justify-content-center">
-          <div class="col-md-4">
-            <ul>
-              <li>Project Management</li>
-              <li>Technology Infrastructure</li>
-              <li>Stakeholder Relations</li>
-            </ul>
+
+        <div class="stats">
+          <div class="stat">
+            <strong>Private Pilot</strong>
+            <span>Aviation is not just an interest — it is already part of the journey.</span>
           </div>
-          <div class="col-md-4">
-            <ul>
-              <li>Process Optimization</li>
-              <li>Business Development</li>
-              <li>Compliance Management</li>
-            </ul>
+          <div class="stat">
+            <strong>Hands-on mindset</strong>
+            <span>Bringing technical problem-solving and operations experience into maintenance.</span>
           </div>
-          <div class="col-md-4">
-            <ul>
-              <li>Team Leadership</li>
-              <li>Strategic Planning</li>
-              <li>Operational Oversight</li>
-            </ul>
+          <div class="stat">
+            <strong>More coming soon</strong>
+            <span>Resume updates, progress milestones, and aviation-focused projects.</span>
           </div>
         </div>
+
+        <div class="tagline">From cloud systems to aircraft systems.</div>
       </div>
-      <div class="card mt-4">
-        <div class="card-body">
-          <h2 class="card-title">Experience</h2>
-          <p><strong>Director of Operations</strong> - Health Safety Institute, The Woodlands TX (Dec 2019 – May 2024)</p>
-          <ul>
-            <li>Oversaw sustainable and adaptable evolution of organization's technology infrastructure to meet current and future needs.</li>
-            <li>Worked cross-department with product group to ensure gaps in Learning Management Systems were addressed and prioritized.</li>
-            <li>Led an initiative to migrate outdated physical render machines to virtual machines, achieving significant cost savings through per-machine licensing reductions of 33%.</li>
-            <li>Supervised the seamless data migration from legacy file servers to Azure, enhancing storage efficiency and reliability.</li>
-            <li>Led project managers to systematically decrease contractor dependencies utilizing FTE utilization metrics. </li>
-          </ul>
-          <p><strong>Director of Operations</strong> - Martech Media (acquired by Health Safety Institute), The Woodlands TX (Aug 2013 - Dec 2019)</p>
-          <ul>
-            <li>Implemented a custom SaaS solution to facilitate B2B services for our company</li>
-            <li>Created off-site cloud storage backups using AWS S3 Glacier for secure, long-term data storage.</li>
-            <li>Architected custom tool set, resulting in 25% reduction in headcount to optimize production processes.</li>
-            <li>Scaled operational processes to support 10% growth in company size, demonstrating adaptability and strategic planning.</li>
-          </ul>
-          <p><strong>Senior Solution Engineer Specialist</strong> - Allianz Life, Minneapolis MN (May 2012 - Aug 2013)</p>
-          <ul>
-            <li>Successfully led technical team in execution of Accenture Life Insurance Platform, reinforcing Allianz Life's commitment to innovative and efficient insurance solutions.</li>
-            <li>Fostered collaborative environment across global teams, optimizing resource allocation and project timelines for maximum productivity.</li>
-          </ul>
-          <p><strong>Senior Manager, Enterprise Architecture</strong> - Best Buy, Minneapolis MN (Dec 2011 - May 2012)</p>
-          <ul>
-            <li>Spearheaded development of company-wide Service-Oriented Architecture, resulting in enhanced system flexibility and reduced integration costs.</li>
-            <li>Developed and standardized reference architectures, ensuring best practices across enterprise deployments and facilitating smoother system upgrades.</li>
-            <li>Provided architectural leadership, promoting principles to drive integration and operational excellence within organization.</li>
-          </ul>
-          <p><strong>Senior Solution Engineer</strong> - Allianz Life, Minneapolis MN (Sep 2004 - Dec 2011)</p>
-          <ul>
-            <li>Drove the architecture, product selection, and implementation of Enterprise Service Bus technology stack. The stack included: a registry, messaging, orchestration, transformation tools, monitoring, and Web Service management.</li>
-            <li>Delivered the implementation of our enterprise-wide SOA architecture resulting in the most mature adoption rate among all of Allianz’s entities.</li>
-            <li>Managed multiple teams across the enterprise through an infrastructure related SOA architecture. This roll-out was on time and within budget.</li>
-            <li>Managed global resources (Application Maintenance and Application Development).</li>
-            <li>Led the implementation of a $500k enterprise scheduling solution for the entire company.</li>
-          </ul>
-          <p><strong>Solutions Delivery Lead</strong> - FICO, Minneapolis MN (Jan 2001 - Sep 2004)</p>
-          <ul>
-            <li>Technical consultant responsible for the implementation of a new product line into an existing data warehouse system. Designed, coded, and tested extraction procedures for analyzing new marketing data.</li>
-            <li>Responsible for overseeing a database conversion from Redbrick to Oracle.  The conversion increased overall system efficiency from two days to eight hours by creating custom stored procedures in place of legacy code.</li>
-            <li>Co-Implemented an Enterprise Scheduler solution.</li>
-            <li>Created custom Perl health monitoring and paging scripts which reduced mean time for batch processing.</li>
-            <li>Developed operational efficiencies by creating and implementing standardized UNIX batch scripts. </li>
-          </ul>
-          <p><strong>Consultant</strong> - Accenture, Minneapolis MN (Jan 1999 - Jan 2001)</p>
-          <ul>
-            <li>Consulted for Fortune 500 clients with a focus on building new revenue channels and reducing capital expenditures by leveraging technology.</li>
-            <li>Technical consultant responsible for deployment of system test, production application, and database servers.  </li>
-            <li>Created and implemented a 24x7 backup and recovery strategy. </li>
-            <li>Performed system builds to support product-testing code integrity. The builds increased code coverage efficiency by creating custom testing suite for releases. </li>
-          </ul>
-        </div>
+
+      <div class="panel photo">
+        <img src="jason-ap-progress.png" alt="Jason Marquette in a hangar with an aircraft in the background" />
       </div>
-      <div class="card mt-4">
-        <div class="card-body">
-          <h2 class="card-title">Certifications</h2>
-          <ul>
-            <li><strong>AWS Certified Solution Architect Associate</strong> - issued June 2025</li>
-            <li><strong>AWS Certified AI Practitioner</strong> - issued July 2025</li>
-          </ul>
-        </div>
-      </div>
-      <div class="card mt-4">
-        <div class="card-body">
-          <h2 class="card-title">Education</h2>
-          <ul>
-            <li><strong>North Dakota State University</strong> - B.S. in Management Information Systems</li>
-            <li><strong>University of North Dakota</strong> - B.B.A. in Financial Management</li>
-          </ul>
-        </div>
-      </div>
-      <div class="card mt-4" >
-        <div class="card-body" >
-          <h2 class="card-title">Technical Proficiencies</h2>
-          <ul>
-            <li><b>Languages &amp; Scripting:</b> Python, Bash, Perl, C#, SQL, PHP</li>
-            <li><b>Cloud &amp; Infrastructure:</b> AWS(EC2, S3, Glacier, IAM, RDS, Lambda, VPC, CloudWatch), VMWare, UNIX/Linux, Windows Server</li>
-            <li><b>Databases:</b> Oracle, MySQL, PostgreSQL, Microsoft SQL Server</li>
-            <li><b>Tools &amp; Technologies:</b> MQ, TCP/IP, Virtualization, CI/CD Pipelines</li>
-          </ul>
-        </div>
-      </div>
+    </section>
+
+    <div class="footer">
+      © 2024 Jason Marquette. All rights reserved.
     </div>
-  </section>
-
- 
-  <!-- Footer -->
-  <footer class="py-4 text-center">
-    <div class="container">
-      <p class="mb-2">&copy; 2025 Jason Marquette. All Rights Reserved.</p>
-      <div>
-        <a href="https://www.linkedin.com/in/jasonmarquette/" target="_blank" rel="noopener"><i class="bi bi-linkedin"></i></a>
-        <a href="https://www.github.com/jasonmarquette" target="_blank" rel="noopener"><i class="bi bi-github"></i></a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Bootstrap JS    -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Three.js via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.min.js"></script>
-  <!-- Three.js HERO BACKGROUND Script -->
-  <script>
-    // Simple wireframe torus knot as background
-    let container = document.getElementById('three-bg');
-    let width = container.offsetWidth || window.innerWidth;
-    let height = container.offsetHeight || 550;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio || 1);
-    container.appendChild(renderer.domElement);
-
-    // Responsive resize
-    window.addEventListener('resize', () => {
-      let w = container.offsetWidth || window.innerWidth;
-      let h = container.offsetHeight || 550;
-      renderer.setSize(w, h);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    });
-
-    // Torus Knot
-    const geometry = new THREE.TorusKnotGeometry(7, 2, 180, 12);
-    const material = new THREE.MeshBasicMaterial({ color: 0x1976d2, wireframe: true, opacity: 0.22, transparent: true });
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    camera.position.z = 22;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      mesh.rotation.x += 0.005;
-      mesh.rotation.y += 0.007;
-      renderer.render(scene, camera);
-    }
-    animate();
-  </script>
-  <!-- Chatbot Drag & Resize Script (unchanged) -->
-  <script>
-    function isMobile() {
-      return window.innerWidth <= 600;
-    }
-    function toggleChat() {
-      const chatbox = document.getElementById("chatbox");
-      const responseBox = document.getElementById("response");
-      const promptBox = document.getElementById("prompt");
-      const opening = chatbox.style.display !== "flex";
-      chatbox.style.display = opening ? "flex" : "none";
-      if (opening) {
-        chatbox.style.flexDirection = "column";
-        if (isMobile()) window.scrollTo(0, 0);
-      } else {
-        responseBox.innerText = "I'm a textbot, ask me a basic question...";
-        promptBox.value = "";
-      }
-    }
-    async function sendPrompt() {
-      const prompt = document.getElementById("prompt").value;
-      const responseBox = document.getElementById("response");
-      responseBox.innerText = "Thinking...";
-      try {
-        const res = await fetch("/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
-        });
-        if (!res.ok) throw new Error("Server error: " + res.status);
-        const data = await res.json();
-        responseBox.innerText = data.response || data.error || "No response.";
-      } catch (err) {
-        responseBox.innerText = "Error: " + err.message;
-      }
-    }
-    // DRAG logic
-    const chatbox = document.getElementById("chatbox");
-    const dragHandle = document.getElementById("drag-handle");
-    let dragStartX, dragStartY, dragBoxLeft, dragBoxTop, dragging = false;
-    dragHandle.addEventListener("mousedown", function(e) {
-      if (isMobile()) return;
-      dragging = true;
-      const rect = chatbox.getBoundingClientRect();
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      dragBoxLeft = rect.left;
-      dragBoxTop = rect.top;
-      document.body.style.userSelect = "none";
-    });
-    window.addEventListener("mousemove", function(e) {
-      if (!dragging) return;
-      let left = dragBoxLeft + (e.clientX - dragStartX);
-      let top = dragBoxTop + (e.clientY - dragStartY);
-      left = Math.max(0, Math.min(window.innerWidth - chatbox.offsetWidth, left));
-      top = Math.max(0, Math.min(window.innerHeight - chatbox.offsetHeight, top));
-      chatbox.style.left = left + "px";
-      chatbox.style.top = top + "px";
-      chatbox.style.right = "auto";
-      chatbox.style.bottom = "auto";
-      chatbox.style.position = "fixed";
-    });
-    window.addEventListener("mouseup", function() {
-      if (dragging) {
-        dragging = false;
-        document.body.style.userSelect = "";
-      }
-    });
-    // RESIZE logic
-    const resizeHandle = chatbox.querySelector(".resize-handle");
-    let isResizing = false, lastX = 0, lastY = 0, startWidth = 0, startHeight = 0;
-    resizeHandle.addEventListener("mousedown", function(e) {
-      if (isMobile()) return;
-      e.preventDefault();
-      isResizing = true;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      startWidth = chatbox.offsetWidth;
-      startHeight = chatbox.offsetHeight;
-      document.body.style.userSelect = "none";
-    });
-    window.addEventListener("mousemove", function(e) {
-      if (!isResizing) return;
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      const minWidth = 260, minHeight = 200, maxWidth = window.innerWidth * 0.95, maxHeight = window.innerHeight * 0.92;
-      let newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
-      let newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight + dy));
-      chatbox.style.width = newWidth + "px";
-      chatbox.style.height = newHeight + "px";
-    });
-    window.addEventListener("mouseup", function() {
-      if (isResizing) {
-        isResizing = false;
-        document.body.style.userSelect = "";
-      }
-    });
-  </script>
+  </div>
 </body>
 </html>
